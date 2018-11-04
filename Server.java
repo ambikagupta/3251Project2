@@ -6,10 +6,8 @@ import java.util.ArrayList;
 class Server{
 
   public static void main(String args[]) throws Exception {
-    //String Lmessage;
-    //String Umessage;
     String message;
-    //String[] words = new String["plan", "puzzle", "academic", "joke", "jacket", "macaroni", "time", "volume", "delivery", "home", "handle", "sprinkle", "jump", "weight", "midnight"];
+
     String[] words = new String[15];
     words[0] = "plan";
     words[1] = "puzzle";
@@ -56,7 +54,6 @@ class Server{
         for(int i = 0; i < word.length(); i++) {
           data = data + "_";
         }
-        //DataOutputStream out = new DataOutputStream(s.getOutputStream());
         out.writeBytes("0," + length + ",0," + data + "\n");
       }
       message = in.readLine();
@@ -87,15 +84,6 @@ class Server{
         }
         out.writeBytes("0," + length + ",0," + data + "\n");
       }
-      //System.out.println("Connected to server");
-      //BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream())); //in to Server
-      //DataOutputStream out = new DataOutputStream(s.getOutputStream()); //out to client
-
-      //Lmessage = in.readLine();
-      //System.out.println("Received (Lowercase): " + Lmessage);
-
-      //Umessage = Lmessage.toUpperCase() + "\n"; //to toUpperCase
-      //out.writeBytes(Umessage); //sends
     }
   }
 }
