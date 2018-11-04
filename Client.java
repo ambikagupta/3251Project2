@@ -32,13 +32,16 @@ class Client {
       message = in.readLine();
       System.out.println("Reading message from server: " + message);
       String[] parts = message.split(",");
+      parts[3] = parts[3].replaceAll("_", "_ ");
       System.out.println(parts[3]);
       System.out.println("Incorrect Guesses: ");
       message = inUser.readLine();
       out.writeBytes("1," + message + "\n");
 
       message = in.readLine();
-      System.out.println(message);
+      parts = message.split(",");
+      parts[3] = parts[3].replaceAll("_", "_ ");
+      System.out.println(parts[3]);
       // BufferedReader inServer = new BufferedReader(new InputStreamReader(s.getInputStream())); //in from server
       //
       // Lmessage = inUser.readLine();

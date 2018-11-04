@@ -54,7 +54,7 @@ class Server{
         length = Integer.toString(word.length());
         data = "";
         for(int i = 0; i < word.length(); i++) {
-          data = data + "_ ";
+          data = data + "_";
         }
         //DataOutputStream out = new DataOutputStream(s.getOutputStream());
         out.writeBytes("0," + length + ",0," + data + "\n");
