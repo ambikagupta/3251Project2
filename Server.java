@@ -32,6 +32,9 @@ class Server{
 		int numIncorrect = 0;
 		String wordInProgress = ""; // blanks with correct letters user has guessed
 		String incorrectGuesses = "";
+    Game g1 = null;
+    Game g2 = null;
+    Game g3 = null;
 
 		int port = Integer.parseInt(args[0]); // port number
 
@@ -39,7 +42,7 @@ class Server{
 
 
 		while(true) {
-		  
+
 			// create new connection
 			Socket s = ss.accept();
 			System.out.println("Accepted the connection");
@@ -48,7 +51,7 @@ class Server{
 
 		  	// reads in message to start game
 		  	clientMsg = in.readLine();
-		  	
+
 		  	// do you even need the next two lines??
 		  	System.out.println("Read the message: " + clientMsg);
 		  	String[] parts = clientMsg.split(""); // splits message into length and letter
@@ -60,7 +63,7 @@ class Server{
 
 				//send the word that the player will be guessing.
 				System.out.println("Empty message sent, start game");
-				
+
 				// select random word
 				int num = rand.nextInt(15);
 				//System.out.println("Random Number selected: " + num);
@@ -74,8 +77,9 @@ class Server{
 				}
 
 				// packet formatted as msg flag = 0, length = word.length, incorrectguesses = 0, data = _____
-				data = wordInProgress + incorrectGuesses;
-				out.writeBytes("0" + length + numIncorrect + data + "\n");
+        g1 = new Game(word, length, numIncorrect, wordInProgress, incorrectGuesses);
+				data = g1.wordInProgress + g1.incorrectGuesses;
+				out.writeBytes("0" + g1.length + g1.numIncorrect + data + "\n");
 			}
 
 
@@ -85,38 +89,38 @@ class Server{
 				String guess = parts[1];
 				//System.out.println(guess);
 				int count = 0;
-				for (int i = 0; i < word.length(); i++) {
-					if (word.indexOf(guess, i) == i) {
+				for (int i = 0; i < g1.word.length(); i++) {
+					if (g1.word.indexOf(guess, i) == i) {
 						count++;
-						wordInProgress = wordInProgress.substring(0, i) + guess + wordInProgress.substring(i + 1);
+						g1.wordInProgress = g1.wordInProgress.substring(0, i) + guess + g1.wordInProgress.substring(i + 1);
 						// might throw out of bounds error (i+1 in above line)
 					}
 				}
 				//System.out.println(wordInProgress);
 
 				if (count == 0) {
-					numIncorrect++;
-					incorrectGuesses += guess;
+					g1.numIncorrect++;
+					g1.incorrectGuesses += guess;
 				}
 
-				if (!(wordInProgress.contains("_"))) {
+				if (!(g1.wordInProgress.contains("_"))) {
 					out.writeBytes("8You Win!\n"); // how do I send the word back? should we send the word back first and then send another message?
-				} else if (numIncorrect >= 6) {
+				} else if (g1.numIncorrect >= 6) {
 					out.writeBytes("9You Lose!\n");
 				} else {
-					data = wordInProgress + incorrectGuesses;
+					data = g1.wordInProgress + g1.incorrectGuesses;
 					System.out.println(data);
-					out.writeBytes("0" + length + numIncorrect + data + "\n");
+					out.writeBytes("0" + g1.length + g1.numIncorrect + data + "\n");
 					//System.out.println("in else");
 				}
-			} 
+			}
 
 		  	// actual game play
 			// message = in.readLine();
 			// parts = message.split(","); // msg length, guess
 			// String guess_1 = parts[1];
 			// char guess = guess_1.charAt(0);
-			  
+
 			// // adds position of guess in word to arraylist
 			// ArrayList<Integer> guessPosition = new ArrayList<>();
 			// for(int i = 0; i < word.length(); i++) {
