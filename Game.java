@@ -6,34 +6,34 @@ public class Game {
 	private String word;  // randomly selected word
 	private int length; // length of word
   	private int numIncorrect;  //
-  	private String wordInProgress;
+  	private String wordInProgress = "";
   	private String incorrectGuesses; // string of incorrect guesses in order
   	private boolean gameOver;
   	private Socket s;
-  	private BufferedReader in; // messages coming in from client
-	private	DataOutputStream out; // message outgoing to clien
+  	//private BufferedReader in; // messages coming in from client
+	//private	DataOutputStream out; // message outgoing to clien
 
   	public Game(String word, Socket s) {
 		this.word = word;
 		this.length = word.length();
 		this.numIncorrect = 0;
-		
+
 		for(int i = 0; i < word.length(); i++) {
 		  	this.wordInProgress += "_";
 		}
 
-		this.incorrectGuesses = "0";
+		this.incorrectGuesses = "";
 		this.gameOver = false;
 		this.s = s;
-		this.in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-		this.out = new DataOutputStream(s.getOutputStream());
+		//this.in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+		//this.out = new DataOutputStream(s.getOutputStream());
   	}
 
   	public String getWord() {
   		return this.word;
   	}
 
-  	public String getLength() {
+  	public int getLength() {
   		return this.length;
   	}
 
@@ -69,12 +69,12 @@ public class Game {
   		this.gameOver = gameOver;
   	}
 
-	public BufferedReader getIn() {
-  		return this.in;
-  	}
-
-  	public DataOutputStream getOut() {
-  		return this.out;
-  	}
+	// public BufferedReader getIn() {
+  // 		return this.in;
+  // 	}
+  //
+  // 	public DataOutputStream getOut() {
+  // 		return this.out;
+  // 	}
 
 }

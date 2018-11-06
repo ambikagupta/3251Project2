@@ -32,9 +32,8 @@ class Server{
 		int numIncorrect = 0;
 		String wordInProgress = ""; // blanks with correct letters user has guessed
 		String incorrectGuesses = "";
+    ArrayList<Game> games = new ArrayList<>();
     Game g1 = null;
-    Game g2 = null;
-    Game g3 = null;
 
 		int port = Integer.parseInt(args[0]); // port number
 
@@ -77,40 +76,46 @@ class Server{
 				}
 
 				// packet formatted as msg flag = 0, length = word.length, incorrectguesses = 0, data = _____
-        g1 = new Game(word, length, numIncorrect, wordInProgress, incorrectGuesses);
-				data = g1.wordInProgress + g1.incorrectGuesses;
-				out.writeBytes("0" + g1.length + g1.numIncorrect + data + "\n");
+        g1 = new Game(word, s);
+				data = "" + g1.getWordInProgress() + g1.getIncorrectGuesses();
+        System.out.println(g1.getLength());
+        System.out.println(g1.getNumIncorrect());
+        String myStr = "0" + g1.getLength() + g1.getNumIncorrect() + data + "\n";
+        System.out.println("--------" + g1.getWordInProgress());
+				out.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
 			}
 
 
-			while (true) {
+			while(true) {
 				clientMsg = in.readLine();
 				parts = clientMsg.split("");
 				String guess = parts[1];
 				//System.out.println(guess);
 				int count = 0;
-				for (int i = 0; i < g1.word.length(); i++) {
-					if (g1.word.indexOf(guess, i) == i) {
+				for (int i = 0; i < g1.getLength(); i++) {
+					if (g1.getWord().indexOf(guess, i) == i) {
 						count++;
-						g1.wordInProgress = g1.wordInProgress.substring(0, i) + guess + g1.wordInProgress.substring(i + 1);
+						g1.setWordInProgress(g1.getWordInProgress().substring(0, i) + guess + g1.getWordInProgress().substring(i + 1));
 						// might throw out of bounds error (i+1 in above line)
 					}
 				}
 				//System.out.println(wordInProgress);
 
 				if (count == 0) {
-					g1.numIncorrect++;
-					g1.incorrectGuesses += guess;
+					//g1.numIncorrect++;
+          g1.setNumIncorrect(g1.getNumIncorrect() + 1);
+          g1.setIncorrectGuesses(g1.getIncorrectGuesses() + guess);
+					//g1.incorrectGuesses += guess;
 				}
 
-				if (!(g1.wordInProgress.contains("_"))) {
+				if (!(g1.getWordInProgress().contains("_"))) {
 					out.writeBytes("8You Win!\n"); // how do I send the word back? should we send the word back first and then send another message?
-				} else if (g1.numIncorrect >= 6) {
+				} else if (g1.getNumIncorrect() >= 6) {
 					out.writeBytes("9You Lose!\n");
 				} else {
-					data = g1.wordInProgress + g1.incorrectGuesses;
+					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
 					System.out.println(data);
-					out.writeBytes("0" + g1.length + g1.numIncorrect + data + "\n");
+					out.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
 					//System.out.println("in else");
 				}
 			}
