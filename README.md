@@ -5,7 +5,14 @@ Hangman!
 Ambika Gupta and Sahithi Puligundla
 
 Connecting server and client and creating codebase: Sahithi
+
+
 One single-player game functionality: Ambika
+
+
+Game class creation: Ambika and Sahithi
+
+
 
 Complile in different command prompts!
     javac Client.java
