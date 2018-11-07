@@ -81,11 +81,11 @@ class Client {
 					int checkCount;
 
 					while (checkInput) {
-						
-						checkCount = 0; // which case to go to 
+
+						checkCount = 0; // which case to go to
 
 
-						// if user presses enter without a character there					
+						// if user presses enter without a character there
 						if (userGuess.length() == 0) {
 							checkCount = 3;
 
@@ -108,7 +108,7 @@ class Client {
 							System.out.print("Letter to Guess: ");
 							userGuess = inUser.readLine();
 						} else {
-							
+
 							// convert uppercase to lowercase
 							if ((int) userGuess.charAt(0) < 97) {
 								userGuess = userGuess.toLowerCase();
@@ -141,7 +141,7 @@ class Client {
 					serverMsg = in.readLine(); // read in server's message
 					parts = serverMsg.split(""); // msg flag, word length, num incorrect, data
 
-					
+
 					numIncorrect = Integer.parseInt(parts[2]);
 					int numBlanks = 0;
 
@@ -149,7 +149,7 @@ class Client {
 					// print out the word to guess
 					for (int i = 3; i < 3 + wordLength; i++) {
 						System.out.print(parts[i] + " ");
-						
+
 						// count the number of blanks left
 						if (parts[i].equals("_")) {
 							numBlanks++;
@@ -167,7 +167,7 @@ class Client {
 
 					// if numIncorrect == 6 or solved word, lose game
 					if (numIncorrect == 6 || numBlanks == 0) {
-						
+
 						// get you win or you lose message
 						serverMsg = "";
 						serverMsg = in.readLine();
@@ -178,7 +178,7 @@ class Client {
 						}
 
 						System.out.println();
-						
+
 
 						// get game over message
 						serverMsg = "";
@@ -202,4 +202,3 @@ class Client {
 		}
 	}
 }
-
