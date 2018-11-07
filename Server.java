@@ -1,7 +1,3 @@
-// Java implementation of Server side
-// It contains two classes : Server and ClientHandler
-// Save file as Server.java
-
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -14,7 +10,7 @@ public class Server
 	{
 		ArrayList<Thread> conns = new ArrayList<>();
 		int port = Integer.parseInt(args[0]);
-		// server is listening on port 5056
+		// server is listening on port given by user
 		ServerSocket ss = new ServerSocket(port);
 
 		// running infinite loop for getting
@@ -22,14 +18,6 @@ public class Server
 		while (true)
 		{
 			Socket s = null;
-			// System.out.println("Size: " + conns.size());
-			// for (Iterator<Thread> citerator = conns.iterator(); citerator.hasNext();) {
-			// 	Thread t = citerator.next();
-			// 	System.out.println("Alive: " + t.isAlive());
-			// 	if(t.isAlive() == false) {
-			// 		citerator.remove();
-			// 	}
-			// }
 
 			try
 			{
@@ -171,7 +159,7 @@ class ClientHandler extends Thread
 						g1.setWordInProgress(g1.getWordInProgress().substring(0, i) + guess + g1.getWordInProgress().substring(i + 1));
 					}
 				}
-				
+
 				// if it was incorrect guess
 				if (count == 0) {
           			g1.setNumIncorrect(g1.getNumIncorrect() + 1);
@@ -196,51 +184,6 @@ class ClientHandler extends Thread
 		} catch (IOException e) {
 				e.printStackTrace();
 			}
-		// while (true)
-		// {
-		// 	try {
-		//
-		// 		// Ask user what he wants
-		// 		dos.writeUTF("What do you want?[Date | Time]..\n"+
-		// 					"Type Exit to terminate connection.");
-		//
-		// 		// receive the answer from client
-		// 		received = dis.readUTF();
-		//
-		// 		if(received.equals("Exit"))
-		// 		{
-		// 			System.out.println("Client " + this.s + " sends exit...");
-		// 			System.out.println("Closing this connection.");
-		// 			this.s.close();
-		// 			System.out.println("Connection closed");
-		// 			break;
-		// 		}
-		//
-		// 		// creating Date object
-		// 		Date date = new Date();
-		//
-		// 		// write on output stream based on the
-		// 		// answer from the client
-		// 		switch (received) {
-		//
-		// 			case "Date" :
-		// 				toreturn = fordate.format(date);
-		// 				dos.writeUTF(toreturn);
-		// 				break;
-		//
-		// 			case "Time" :
-		// 				toreturn = fortime.format(date);
-		// 				dos.writeUTF(toreturn);
-		// 				break;
-		//
-		// 			default:
-		// 				dos.writeUTF("Invalid input");
-		// 				break;
-		// 		}
-		// 	} catch (IOException e) {
-		// 		e.printStackTrace();
-		// 	}
-		// }
 
 		try
 		{
