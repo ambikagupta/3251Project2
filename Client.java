@@ -36,8 +36,19 @@ class Client {
 			BufferedReader inUser = new BufferedReader(new InputStreamReader(System.in)); //user InputStreamReader
 			String yn = inUser.readLine();    // ready to start game
 
-			if(yn.equals("n") || yn.equals("N") || yn.equals("no") || yn.equals("No") || yn.equals("NO")) {
-			  	// something needs to be sent to server??
+			boolean checkYN = true;
+			
+			while (checkYN) {
+				if (!(yn.equals("y") || yn.equals("n") || yn.equals("Y") || yn.equals("N"))) {
+					System.out.println("Ready to start game? (y/n)");
+					inUser = new BufferedReader(new InputStreamReader(System.in)); //user InputStreamReader
+					yn = inUser.readLine();    // ready to start game
+				} else {
+					checkYN = false;
+				}
+			}
+
+			if(yn.equals("n") || yn.equals("N")) {
 			  	s.close();
 			} else {
 
