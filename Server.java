@@ -12,7 +12,7 @@ public class Server
 {
 	public static void main(String[] args) throws IOException
 	{
-		int connections = 0;
+		ArrayList<Thread> conns = new ArrayList<>();
 		int port = Integer.parseInt(args[0]);
 		// server is listening on port 5056
 		ServerSocket ss = new ServerSocket(port);
@@ -22,11 +22,26 @@ public class Server
 		while (true)
 		{
 			Socket s = null;
+			// System.out.println("Size: " + conns.size());
+			// for (Iterator<Thread> citerator = conns.iterator(); citerator.hasNext();) {
+			// 	Thread t = citerator.next();
+			// 	System.out.println("Alive: " + t.isAlive());
+			// 	if(t.isAlive() == false) {
+			// 		citerator.remove();
+			// 	}
+			// }
 
 			try
 			{
 				// socket object to receive incoming client requests
 				s = ss.accept();
+
+				for (Iterator<Thread> citerator = conns.iterator(); citerator.hasNext();) {
+					Thread t = citerator.next();
+					if(t.isAlive() == false) {
+						citerator.remove();
+					}
+				}
 
 				System.out.println("A new client is connected : " + s);
 
@@ -34,13 +49,19 @@ public class Server
 				DataInputStream dis = new DataInputStream(s.getInputStream());
 				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
-				System.out.println("Assigning new thread for this client");
+				if(conns.size() == 3) {
+					dos.writeBytes("1server-overloaded" + "\n");
+				} else {
+					System.out.println("Assigning new thread for this client");
 
-				// create a new thread object
-				Thread t = new ClientHandler(s, dis, dos);
+					// create a new thread object
+					Thread t = new ClientHandler(s, dis, dos);
+					conns.add(t);
 
-				// Invoking the start() method
-				t.start();
+					// Invoking the start() method
+					t.start();
+				}
+
 
 			}
 			catch (Exception e){

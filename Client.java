@@ -19,19 +19,31 @@ class Client {
 
 
 		Socket s = new Socket(addr, serverPort);
+		BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream())); //in from server
+		if(in.ready() == true) {
+			String over = in.readLine();
+			System.out.println("");
+			String [] parts = over.split("");
+			String display = "";
+			for(int i = 1; i < parts.length; i++) {
+				display = display + parts[i];
+			}
+			System.out.println(display);
+			System.out.println(display);
+			s.close();
+		} else {
 		System.out.println("Ready to start game? (y/n)");
 		BufferedReader inUser = new BufferedReader(new InputStreamReader(System.in)); //user InputStreamReader
-		BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream())); //in from server
 		String yn = inUser.readLine();    // ready to start game
-		
+
 		if(yn.equals("n") || yn.equals("N") || yn.equals("no") || yn.equals("No") || yn.equals("NO")) {
 		  	// something needs to be sent to server??
 		  	s.close();
 		} else {
-		  
+
 			System.out.println("User selected yes");
 			DataOutputStream out = new DataOutputStream(s.getOutputStream()); // message to send to server
-			  
+
 			System.out.println("Send empty message to server.");
 			out.writeBytes("0\n"); // send 0 signaling to start the game
 
@@ -49,28 +61,28 @@ class Client {
 
 			numIncorrect = 0;
 
-			
+
 			System.out.println(wordInProg);
 
 			System.out.println("Incorrect Guesses: \n");
-		  
-		  
+
+
 			boolean myBool = true;
 
 
 		  	// start actual game
 			while (myBool) {
 
-				
+
 				boolean checkInput = true; // check if user's input is valid
-				
+
 				System.out.print("Letter to Guess: ");
 				userGuess = inUser.readLine();  // read in user's guess
 				int checkCount;
 
 				while (checkInput) {
 					checkCount = 0;
-					
+
 
 					// if they enter more than one letter
 					if (userGuess.length() > 1) {
@@ -110,7 +122,7 @@ class Client {
 				serverMsg = "";
 				serverMsg = in.readLine(); // read in server's message
 				parts = serverMsg.split(""); // msg flag, word length, num incorrect, data
-				
+
 
 
 				// if you won or if you lost
@@ -128,16 +140,16 @@ class Client {
 
 				// if we're still playing the game
 				} else {
-				  	
+
 				  	numIncorrect = Integer.parseInt(parts[2]);
-				  	
+
 
 				  	// print out the word to guess
 				  	for (int i = 3; i < 3 + wordLength; i++) {
 				  		System.out.print(parts[i] + " ");
 				  	}
 				  	System.out.println(""); // line space
-				  	
+
 
 				  	// format and print out incorrect guesses
 				  	incorrectGuesses = "";
@@ -147,6 +159,7 @@ class Client {
 				  	System.out.println("Incorrect Guessses: " + incorrectGuesses + "\n");
 				}
 			}
+		}
 		}
 	}
 }
