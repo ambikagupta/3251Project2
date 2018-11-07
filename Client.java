@@ -81,11 +81,16 @@ class Client {
 				int checkCount;
 
 				while (checkInput) {
-					checkCount = 0;
+					
+					checkCount = 0; // which case to go to 
 
 
-					// if they enter more than one letter
-					if (userGuess.length() > 1) {
+					// if user presses enter without a character there					
+					if (userGuess.length() == 0) {
+						checkCount = 3;
+
+					// if user enters multiple characters
+					} else if (userGuess.length() > 1) {
 						checkCount = 1;
 
 					// if they enter a non-letter
@@ -93,16 +98,29 @@ class Client {
 						checkCount = 1;
 					}
 
-					if (checkCount == 1) {
+
+
+					if (checkCount == 3) {
+						System.out.print("Letter to Guess: ");
+						userGuess = inUser.readLine();
+					} else if (checkCount == 1) {
 						System.out.println("Error! Please guess one letter.");
 						System.out.print("Letter to Guess: ");
 						userGuess = inUser.readLine();
 					} else {
+						
+						// convert uppercase to lowercase
+						if ((int) userGuess.charAt(0) < 97) {
+							userGuess = userGuess.toLowerCase();
+						}
+
+						// check if guess has already been guessed before
 						for (int i = 0; i < numIncorrect + wordLength; i++) {
 							if (userGuess.equals(parts[3 + i])) {
 								checkCount = 2;
 							}
 						}
+
 						if (checkCount == 2) {
 							System.out.println("Error! Letter \"" + userGuess + "\" has been guessed before, please guess another letter.");
 							System.out.print("Letter to Guess: ");
@@ -124,6 +142,12 @@ class Client {
 				parts = serverMsg.split(""); // msg flag, word length, num incorrect, data
 
 
+				
+
+
+
+
+
 
 				// if you won or if you lost
 				// TODO - formatting for winning message - has to include the word
@@ -134,7 +158,6 @@ class Client {
 					System.out.println("at end");
 					myBool = false;
 
-					// TODO how to end gracefully?
 					s.close();
 
 
