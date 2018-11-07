@@ -29,7 +29,7 @@ class Client {
 				display = display + parts[i];
 			}
 			System.out.println(display);
-			System.out.println(display);
+			System.out.println("");
 			s.close();
 		} else {
 			System.out.println("Ready to start game? (y/n)");
@@ -37,7 +37,7 @@ class Client {
 			String yn = inUser.readLine();    // ready to start game
 
 			boolean checkYN = true;
-			
+
 			while (checkYN) {
 				if (!(yn.equals("y") || yn.equals("n") || yn.equals("Y") || yn.equals("N"))) {
 					System.out.println("Ready to start game? (y/n)");
