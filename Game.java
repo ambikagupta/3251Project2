@@ -61,7 +61,7 @@ public class Game {
   		this.incorrectGuesses = incorrectGuesses;
   	}
 
-  	public boolean getGameOVer() {
+  	public boolean getGameOver() {
   		return this.gameOver;
   	}
 

@@ -1,11 +1,75 @@
-import java.net.*;
+// Java implementation of Server side
+// It contains two classes : Server and ClientHandler
+// Save file as Server.java
+
 import java.io.*;
-import java.util.Random;
-import java.util.ArrayList;
+import java.text.*;
+import java.util.*;
+import java.net.*;
 
-class Server{
+// Server class
+public class Server
+{
+	public static void main(String[] args) throws IOException
+	{
+		int connections = 0;
+		int port = Integer.parseInt(args[0]);
+		// server is listening on port 5056
+		ServerSocket ss = new ServerSocket(port);
 
-  	public static void main(String args[]) throws Exception {
+		// running infinite loop for getting
+		// client request
+		while (true)
+		{
+			Socket s = null;
+
+			try
+			{
+				// socket object to receive incoming client requests
+				s = ss.accept();
+
+				System.out.println("A new client is connected : " + s);
+
+				// obtaining input and out streams
+				DataInputStream dis = new DataInputStream(s.getInputStream());
+				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+
+				System.out.println("Assigning new thread for this client");
+
+				// create a new thread object
+				Thread t = new ClientHandler(s, dis, dos);
+
+				// Invoking the start() method
+				t.start();
+
+			}
+			catch (Exception e){
+				s.close();
+				e.printStackTrace();
+			}
+		}
+	}
+}
+
+// ClientHandler class
+class ClientHandler extends Thread
+{
+	final DataInputStream in;
+	final DataOutputStream out;
+	final Socket s;
+
+
+	// Constructor
+	public ClientHandler(Socket s, DataInputStream dis, DataOutputStream dos)
+	{
+		this.s = s;
+		this.in = dis;
+		this.out = dos;
+	}
+
+	@Override
+	public void run()
+	{
 		String message;
 		String clientMsg;
 
@@ -35,18 +99,7 @@ class Server{
     ArrayList<Game> games = new ArrayList<>();
     Game g1 = null;
 
-		int port = Integer.parseInt(args[0]); // port number
-
-		ServerSocket ss = new ServerSocket(port);
-
-
-		while(true) {
-
-			// create new connection
-			Socket s = ss.accept();
-			System.out.println("Accepted the connection");
-			BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream())); // messages coming in from client
-			DataOutputStream out = new DataOutputStream(s.getOutputStream()); // message outgoing to clien
+		try {
 
 		  	// reads in message to start game
 		  	clientMsg = in.readLine();
@@ -86,7 +139,7 @@ class Server{
 			}
 
 
-			while(true) {
+			while(g1.getGameOver() == false) {
 				clientMsg = in.readLine();
 				parts = clientMsg.split("");
 				String guess = parts[1];
@@ -109,8 +162,10 @@ class Server{
 				}
 
 				if (!(g1.getWordInProgress().contains("_"))) {
+					g1.setGameOver(true);
 					out.writeBytes("8You Win!\n"); // how do I send the word back? should we send the word back first and then send another message?
 				} else if (g1.getNumIncorrect() >= 6) {
+					g1.setGameOver(true);
 					out.writeBytes("9You Lose!\n");
 				} else {
 					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
@@ -119,39 +174,63 @@ class Server{
 					//System.out.println("in else");
 				}
 			}
+		} catch (IOException e) {
+				e.printStackTrace();
+			}
+		// while (true)
+		// {
+		// 	try {
+		//
+		// 		// Ask user what he wants
+		// 		dos.writeUTF("What do you want?[Date | Time]..\n"+
+		// 					"Type Exit to terminate connection.");
+		//
+		// 		// receive the answer from client
+		// 		received = dis.readUTF();
+		//
+		// 		if(received.equals("Exit"))
+		// 		{
+		// 			System.out.println("Client " + this.s + " sends exit...");
+		// 			System.out.println("Closing this connection.");
+		// 			this.s.close();
+		// 			System.out.println("Connection closed");
+		// 			break;
+		// 		}
+		//
+		// 		// creating Date object
+		// 		Date date = new Date();
+		//
+		// 		// write on output stream based on the
+		// 		// answer from the client
+		// 		switch (received) {
+		//
+		// 			case "Date" :
+		// 				toreturn = fordate.format(date);
+		// 				dos.writeUTF(toreturn);
+		// 				break;
+		//
+		// 			case "Time" :
+		// 				toreturn = fortime.format(date);
+		// 				dos.writeUTF(toreturn);
+		// 				break;
+		//
+		// 			default:
+		// 				dos.writeUTF("Invalid input");
+		// 				break;
+		// 		}
+		// 	} catch (IOException e) {
+		// 		e.printStackTrace();
+		// 	}
+		// }
 
-		  	// actual game play
-			// message = in.readLine();
-			// parts = message.split(","); // msg length, guess
-			// String guess_1 = parts[1];
-			// char guess = guess_1.charAt(0);
+		try
+		{
+			// closing resources
+			this.in.close();
+			this.out.close();
 
-			// // adds position of guess in word to arraylist
-			// ArrayList<Integer> guessPosition = new ArrayList<>();
-			// for(int i = 0; i < word.length(); i++) {
-			// 	char c = word.charAt(i);
-			// 	if(c == guess) {
-			// 		guessPosition.add(i);
-			// 	}
-			// }
-
-		  	// if the arraylist doesn't have anything in it, send the message
-		 //  	if(guessPosition.size() == 0) {
-			// 	out.writeBytes("0," + length + ",1," + data + "," + guess_1 + "\n");
-		 //  	} else {
-			// 	for(int i = 0; i < guessPosition.size(); i++) {
-			//   	int pos = guessPosition.get(i);
-			//   	String old_data = data;
-			//   	data = "";
-			//   	for(int j = 0; j < word.length(); j++) {
-			// 		if(j == pos) {
-			// 	  		data = data + guess;
-			// 		} else {
-			// 	  		data = data + old_data.charAt(j);
-			// 		}
-			//   	}
-			// }
-			// out.writeBytes("0," + length + ",0," + data + "\n");
+		}catch(IOException e){
+			e.printStackTrace();
 		}
-  	}
+	}
 }
