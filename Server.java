@@ -23,6 +23,7 @@ public class Server {
 
 				for (Iterator<Thread> citerator = conns.iterator(); citerator.hasNext();) {
 					Thread t = citerator.next();
+					//System.out.println("Thread: " + t.isAlive());
 					if(t.isAlive() == false) {
 						citerator.remove();
 					}
@@ -34,48 +35,91 @@ public class Server {
 				DataInputStream dis = new DataInputStream(s.getInputStream());
 				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
-				String line = dis.readLine();
-				if(line.equals("2")) {
-					System.out.println("Multiplayer Selected");
-					if(multi_conns_queue.size() == 0) {
-						System.out.println("There are no clients waiting for multi");
-						MultiPlayerConn m = new MultiPlayerConn(s, dis, dos);
-						multi_conns_queue.add(m);
-						System.out.println("Add multi client to queue");
-						dos.writeBytes("25Waiting for other player!" + "\n");
-					} else {
-						System.out.println("There is a player waiting for multi");
-						MultiPlayerConn m = multi_conns_queue.get(0);
+				if(conns.size() == 3) {
+					dos.writeBytes("1server-overloaded" + "\n");
+				} else {
+					String line = dis.readLine();
+					if(line.equals("2")) {
+						System.out.println("Multiplayer Selected");
+						if(multi_conns_queue.size() == 0) {
+							System.out.println("There are no clients waiting for multi");
+							MultiPlayerConn m = new MultiPlayerConn(s, dis, dos);
+							multi_conns_queue.add(m);
+							System.out.println("Add multi client to queue");
+							dos.writeBytes("25Waiting for other player!" + "\n");
+						} else {
+							System.out.println("There is a player waiting for multi");
+							MultiPlayerConn m = multi_conns_queue.get(0);
+								System.out.println("Assigning new multi thread for this client");
+								multi_conns_queue.remove(m);
+
+								// create a new thread object
+								Thread t = new MultiClientHandler(m.s, m.in, m.out, s, dis, dos);
+								conns.add(t);
+
+								// Invoking the start() method
+								t.start();
+						}
+					 } else {
 						if(conns.size() == 3) {
-							m.out.writeBytes("1server-overloaded" + "\n");
-							multi_conns_queue.remove(m);
 							dos.writeBytes("1server-overloaded" + "\n");
 						} else {
-							System.out.println("Assigning new multi thread for this client");
-							multi_conns_queue.remove(m);
+							System.out.println("Assigning new thread for this client");
 
 							// create a new thread object
-							Thread t = new MultiClientHandler(m.s, m.in, m.out, s, dis, dos);
+							Thread t = new ClientHandler(s, dis, dos);
 							conns.add(t);
 
 							// Invoking the start() method
 							t.start();
 						}
-					}
-				 } else {
-					if(conns.size() == 3) {
-						dos.writeBytes("1server-overloaded" + "\n");
-					} else {
-						System.out.println("Assigning new thread for this client");
-
-						// create a new thread object
-						Thread t = new ClientHandler(s, dis, dos);
-						conns.add(t);
-
-						// Invoking the start() method
-						t.start();
-					}
-				 }
+					 }
+				}
+				// if(line.equals("2")) {
+				// 	System.out.println("Multiplayer Selected");
+				// 	if(multi_conns_queue.size() == 0) {
+				// 		System.out.println("There are no clients waiting for multi");
+				// 		if(conns.size() == 3) {
+				// 			dos.writeBytes("10server-overloaded" + "\n");
+				// 		} else {
+				// 			MultiPlayerConn m = new MultiPlayerConn(s, dis, dos);
+				// 			multi_conns_queue.add(m);
+				// 			System.out.println("Add multi client to queue");
+				// 			dos.writeBytes("25Waiting for other player!" + "\n");
+				// 		}
+				// 	} else {
+				// 		System.out.println("There is a player waiting for multi");
+				// 		MultiPlayerConn m = multi_conns_queue.get(0);
+				// 		if(conns.size() == 3) {
+				// 			m.out.writeBytes("1server-overloaded" + "\n");
+				// 			multi_conns_queue.remove(m);
+				// 			dos.writeBytes("1server-overloaded" + "\n");
+				// 		} else {
+				// 			System.out.println("Assigning new multi thread for this client");
+				// 			multi_conns_queue.remove(m);
+				//
+				// 			// create a new thread object
+				// 			Thread t = new MultiClientHandler(m.s, m.in, m.out, s, dis, dos);
+				// 			conns.add(t);
+				//
+				// 			// Invoking the start() method
+				// 			t.start();
+				// 		}
+				// 	}
+				//  } else {
+				// 	if(conns.size() == 3) {
+				// 		dos.writeBytes("1server-overloaded" + "\n");
+				// 	} else {
+				// 		System.out.println("Assigning new thread for this client");
+				//
+				// 		// create a new thread object
+				// 		Thread t = new ClientHandler(s, dis, dos);
+				// 		conns.add(t);
+				//
+				// 		// Invoking the start() method
+				// 		t.start();
+				// 	}
+				//  }
 
 
 			}
@@ -424,7 +468,7 @@ class MultiClientHandler extends Thread {
 				out1.writeBytes("10Your Turn!\n");
 				data = g1.getWordInProgress() + g1.getIncorrectGuesses();
 				System.out.println(data);
-				out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");				
+				out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
 
 			}
 		} catch (IOException e) {

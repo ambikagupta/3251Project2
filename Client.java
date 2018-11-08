@@ -64,17 +64,17 @@ class Client {
 
 				// get "game starting message"
 				serverMsg = in.readLine();
-				
-				
+
+
 				// get first turn message
 				serverMsg = in.readLine();
 				System.out.println(serverMsg.substring(2));
-				
+
 				serverMsg = in.readLine();
-				
 
 
-				// if not game packet, wait until "Your Turn!" for player 2 
+
+				// if not game packet, wait until "Your Turn!" for player 2
 				if (serverMsg.charAt(0) != '0') {
 					System.out.println("I should only be here if I'm player 2!!");
 					System.out.println(serverMsg.substring(2));
@@ -208,16 +208,16 @@ class Client {
 					// 	// for formatting lololol
 					// 	System.out.println();
 					// }
-					
+
 
 					serverMsg = in.readLine();
 					System.out.println(serverMsg.substring(2));		// WAITING ON P2 OR YOUR TURN
 
-					
+
 					// WAITING ON P2
 					serverMsg = in.readLine();
 
-					
+
 					if (serverMsg.charAt(0) != '0') {
 						System.out.println(serverMsg.substring(2));
 						serverMsg = in.readLine();
@@ -329,7 +329,7 @@ class Client {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////-------------SINGLE PLAYER BELOW----------///////////////////////////////////////////////////			
+//////////////////////////////////-------------SINGLE PLAYER BELOW----------///////////////////////////////////////////////////
 
 
 
@@ -555,6 +555,6 @@ class Client {
 	// 				return userGuess;
 	// 			}
 	// 		}
-	// 	}		
+	// 	}
 	// }
 }
