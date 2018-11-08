@@ -42,7 +42,7 @@ public class Server {
 						MultiPlayerConn m = new MultiPlayerConn(s, dis, dos);
 						multi_conns_queue.add(m);
 						System.out.println("Add multi client to queue");
-						dos.writeBytes("1Waiting for other player!" + "\n");
+						dos.writeBytes("25Waiting for other player!" + "\n");
 					} else {
 						System.out.println("There is a player waiting for multi");
 						MultiPlayerConn m = multi_conns_queue.get(0);
@@ -235,9 +235,9 @@ class ClientHandler extends Thread {
 }
 
 class MultiClientHandler extends Thread {
-	final DataInputStream in;
-	final DataOutputStream out;
-	final Socket s;
+	final DataInputStream in1;
+	final DataOutputStream out1;
+	final Socket s1;
 	final Socket s2;
 	final DataInputStream in2;
 	final DataOutputStream out2;
@@ -245,9 +245,9 @@ class MultiClientHandler extends Thread {
 
 	// Constructor
 	public MultiClientHandler(Socket s1, DataInputStream dis1, DataOutputStream dos1, Socket s2, DataInputStream dis2, DataOutputStream dos2) {
-		this.s = s1;
-		this.in = dis1;
-		this.out = dos1;
+		this.s1 = s1;
+		this.in1 = dis1;
+		this.out1 = dos1;
 		this.s2 = s2;
 		this.in2 = dis2;
 		this.out2 = dos2;
@@ -287,20 +287,25 @@ class MultiClientHandler extends Thread {
 		try {
 
 		  	// reads in message to start game
-		  	clientMsg = in.readLine();
+		  	//clientMsg = in.readLine();
 
 		  	// do you even need the next two lines??
-		  	System.out.println("Read the message: " + clientMsg);
-		  	String[] parts = clientMsg.split(""); // splits message into length and letter
+		  	//System.out.println("Read the message: " + clientMsg);
+		  	//String[] parts = clientMsg.split(""); // splits message into length and letter
+		  	String[] parts;
 
 
 		  	// set up for game
 		  	// picks random word, creates header
-		  	if(parts[0].equals("0")) {
+		  	//if(parts[0].equals("0")) {
 
 				//send the word that the player will be guessing.
-				System.out.println("Empty message sent, start game");
+				//System.out.println("Empty message sent, start game");
 
+		  	//game start
+		  	out1.writeBytes("14Game Starting!\n");
+		  	out1.writeBytes("10Your Turn!\n");
+		  	out2.writeBytes("14Game Starting!\n");
 				// select random word
 				int num = rand.nextInt(15);
 				//System.out.println("Random Number selected: " + num);
@@ -314,21 +319,25 @@ class MultiClientHandler extends Thread {
 				}
 
 				// packet formatted as msg flag = 0, length = word.length, incorrectguesses = 0, data = _____
-		        g1 = new Game(word, s);
+		        g1 = new Game(word, s1);
 				data = "" + g1.getWordInProgress() + g1.getIncorrectGuesses();
 		        System.out.println(g1.getLength());
 		        System.out.println(g1.getNumIncorrect());
 		        String myStr = "0" + g1.getLength() + g1.getNumIncorrect() + data + "\n";
 		        System.out.println("--------" + g1.getWordInProgress());
-				out.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
-			}
+				out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
+
+				//send packet to p2 saying waiting for p1
+				out2.writeBytes("19Waiting on Player 1" + "\n");
+			//}
 
 
 			while(g1.getGameOver() == false) {
-				clientMsg = in.readLine();
+				clientMsg = in1.readLine();
 				parts = clientMsg.split("");
 				String guess = parts[1];
 				int count = 0; // number of hits with guess
+				boolean incorrect = false;
 				for (int i = 0; i < g1.getLength(); i++) {
 					if (g1.getWord().indexOf(guess, i) == i) {
 						count++;
@@ -340,21 +349,82 @@ class MultiClientHandler extends Thread {
 				if (count == 0) {
           			g1.setNumIncorrect(g1.getNumIncorrect() + 1);
           			g1.setIncorrectGuesses(g1.getIncorrectGuesses() + guess);
+          			incorrect = true;
 				}
 
-				data = g1.getWordInProgress() + g1.getIncorrectGuesses();
-				System.out.println(data);
-				out.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
+				if(incorrect == true) {
+					out1.writeBytes("9INCORRECT\n");
+				} else {
+					out1.writeBytes("7CORRECT\n");
+				}
 
 				if (!(g1.getWordInProgress().contains("_"))) {
 					g1.setGameOver(true);
-					out.writeBytes("8You Win!\n");
-					out.writeBytes("9GAME OVER\n");
+					out1.writeBytes("8You Win!\n");
+					out1.writeBytes("9GAME OVER\n");
+					out2.writeBytes("8You Win!\n");
+					out2.writeBytes("9GAME OVER\n");
 				} else if (g1.getNumIncorrect() >= 6) {
 					g1.setGameOver(true);
-					out.writeBytes("9You Lose!\n");
-					out.writeBytes("9GAME OVER\n");
+					out1.writeBytes("9You Lose!\n");
+					out1.writeBytes("9GAME OVER\n");
+					out2.writeBytes("9You Lose!\n");
+					out2.writeBytes("9GAME OVER\n");
 				}
+
+				out1.writeBytes("19Waiting on Player 2\n");
+				out2.writeBytes("10Your Turn!\n");
+				data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+				System.out.println(data);
+				out2.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
+
+
+
+				//Player 2 game play
+				clientMsg = in2.readLine();
+				parts = clientMsg.split("");
+				guess = parts[1];
+				count = 0; // number of hits with guess
+				incorrect = false;
+				for (int i = 0; i < g1.getLength(); i++) {
+					if (g1.getWord().indexOf(guess, i) == i) {
+						count++;
+						g1.setWordInProgress(g1.getWordInProgress().substring(0, i) + guess + g1.getWordInProgress().substring(i + 1));
+					}
+				}
+
+				// if it was incorrect guess
+				if (count == 0) {
+          			g1.setNumIncorrect(g1.getNumIncorrect() + 1);
+          			g1.setIncorrectGuesses(g1.getIncorrectGuesses() + guess);
+          			incorrect = true;
+				}
+
+				if(incorrect == true) {
+					out2.writeBytes("9INCORRECT\n");
+				} else {
+					out2.writeBytes("7CORRECT\n");
+				}
+
+				if (!(g1.getWordInProgress().contains("_"))) {
+					g1.setGameOver(true);
+					out1.writeBytes("8You Win!\n");
+					out1.writeBytes("9GAME OVER\n");
+					out2.writeBytes("8You Win!\n");
+					out2.writeBytes("9GAME OVER\n");
+				} else if (g1.getNumIncorrect() >= 6) {
+					g1.setGameOver(true);
+					out1.writeBytes("9You Lose!\n");
+					out1.writeBytes("9GAME OVER\n");
+					out2.writeBytes("9You Lose!\n");
+					out2.writeBytes("9GAME OVER\n");
+				}
+
+				out2.writeBytes("19Waiting on Player 1\n");
+				out1.writeBytes("10Your Turn!\n");
+				data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+				System.out.println(data);
+				out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");				
 
 			}
 		} catch (IOException e) {
@@ -364,8 +434,10 @@ class MultiClientHandler extends Thread {
 		try
 		{
 			// closing resources
-			this.in.close();
-			this.out.close();
+			this.in1.close();
+			this.out1.close();
+			this.in2.close();
+			this.out2.close();
 
 		}catch(IOException e){
 			e.printStackTrace();
