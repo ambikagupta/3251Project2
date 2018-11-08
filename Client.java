@@ -177,6 +177,53 @@ class Client {
 					System.out.println(serverMsg.substring(1));		// CORRECT OR INCORRECT
 
 
+
+					serverMsg = in.readLine();
+
+					// player 1 has won the game, initiate end flow for player 2
+					if (serverMsg.charAt(0) == '0') {
+
+						parts = serverMsg.split("");
+						// print out the word - whether win or lose
+						for (int i = 3; i < 3 + wordLength; i++) {
+							System.out.print(parts[i] + " ");
+						}
+
+
+						if (Integer.parseInt(parts[2]) == 6) {
+							System.out.println();
+							incorrectGuesses = "";
+							for (int i = 3 + wordLength; i < parts.length; i++) {
+								incorrectGuesses = incorrectGuesses + parts[i] + " ";
+							}
+							System.out.println("Incorrect Guesses: " + incorrectGuesses);
+						}
+
+						// get you win/lose message
+						serverMsg = in.readLine();
+						parts = serverMsg.split("");
+						int len = Integer.parseInt(parts[0]);
+						for (int i = 1; i <= len; i++) {
+							System.out.print(parts[i]);
+						}
+
+						System.out.println();
+
+
+						// get game over message
+						serverMsg = "";
+						serverMsg = in.readLine();
+						parts = serverMsg.split("");
+						len = Integer.parseInt(parts[0]);
+						for (int i = 1; i <= len; i++) {
+							System.out.print(parts[i]);
+						}
+
+						myBool = false;
+
+						s.close();
+
+
 					// if (numIncorrect == 6 || numBlanks == 0) {
 
 					// 	// get you win or you lose message
@@ -204,13 +251,12 @@ class Client {
 
 					// 	s.close();
 
-					// } else {
-					// 	// for formatting lololol
-					// 	System.out.println();
-					// }
+					} else {
+						// for formatting lololol
+						System.out.println();
+					}
 
 
-					serverMsg = in.readLine();
 					System.out.println(serverMsg.substring(2));		// WAITING ON P2 OR YOUR TURN
 
 

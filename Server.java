@@ -377,6 +377,10 @@ class MultiClientHandler extends Thread {
 
 
 			while(g1.getGameOver() == false) {
+				
+
+////////////////////////////////////////////////////////// player 1's turn /////////////////////////////////////////////////
+
 				clientMsg = in1.readLine();
 				parts = clientMsg.split("");
 				String guess = parts[1];
@@ -402,19 +406,37 @@ class MultiClientHandler extends Thread {
 					out1.writeBytes("7CORRECT\n");
 				}
 
+
+
 				if (!(g1.getWordInProgress().contains("_"))) {
 					g1.setGameOver(true);
 					out1.writeBytes("8You Win!\n");
 					out1.writeBytes("9GAME OVER\n");
+
+					// send game packet to player 2
+					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+					out2.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
+
 					out2.writeBytes("8You Win!\n");
 					out2.writeBytes("9GAME OVER\n");
 				} else if (g1.getNumIncorrect() >= 6) {
 					g1.setGameOver(true);
 					out1.writeBytes("9You Lose!\n");
 					out1.writeBytes("9GAME OVER\n");
+
+					// send game packet to player 2
+					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+					System.out.println("number of incorrect guesses is: " + g1.getNumIncorrect());
+					out2.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
+
 					out2.writeBytes("9You Lose!\n");
 					out2.writeBytes("9GAME OVER\n");
 				}
+
+
+
+/////////////////////////////////////////////////// player 2's turn /////////////////////////////////////////////////////////////////////////////
+
 
 				out1.writeBytes("19Waiting on Player 2\n");
 				out2.writeBytes("10Your Turn!\n");
