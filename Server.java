@@ -36,7 +36,7 @@ public class Server {
 				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
 				if(conns.size() == 3) {
-					dos.writeBytes("1server-overloaded" + "\n");
+					dos.writeBytes("server-overloaded" + "\n");
 				} else {
 					String line = dis.readLine();
 					if(line.equals("2")) {
@@ -46,7 +46,7 @@ public class Server {
 							MultiPlayerConn m = new MultiPlayerConn(s, dis, dos);
 							multi_conns_queue.add(m);
 							System.out.println("Add multi client to queue");
-							dos.writeBytes("25Waiting for other player!" + "\n");
+							dos.writeBytes("Waiting for other player!" + "\n");
 						} else {
 							System.out.println("There is a player waiting for multi");
 							MultiPlayerConn m = multi_conns_queue.get(0);
@@ -62,7 +62,7 @@ public class Server {
 						}
 					 } else {
 						if(conns.size() == 3) {
-							dos.writeBytes("1server-overloaded" + "\n");
+							dos.writeBytes("server-overloaded" + "\n");
 						} else {
 							System.out.println("Assigning new thread for this client");
 
@@ -159,8 +159,17 @@ class ClientHandler extends Thread {
 
 	@Override
 	public void run() {
-		String message;
-		String clientMsg;
+		String message; // server's message
+		String clientMsg; // client's message
+		String[] parts; // will hold client's message
+		String guess; // will hold client's guess
+		String word = ""; // holder for assigned word
+		String data = ""; // word in progress and incorrect guesses
+		int numIncorrect = 0; // number of incorrect guesses
+		String wordInProgress = ""; // blanks with correct letters user has guessed
+		String incorrectGuesses = ""; // actual incorrect guesses
+    	Game g1 = null; // game object
+    	int numHits = 0; // number of hits with guess
 
 		String[] words = new String[15];
 		words[0] = "plan";
@@ -179,86 +188,79 @@ class ClientHandler extends Thread {
 		words[13] = "weight";
 		words[14] = "midnight";
 		Random rand = new Random();
-		String word = "";
-		String length = "";
-		String data = "";
-		int numIncorrect = 0;
-		String wordInProgress = ""; // blanks with correct letters user has guessed
-		String incorrectGuesses = "";
-    	ArrayList<Game> games = new ArrayList<>();
-    	Game g1 = null;
+
 
 		try {
 
-		  	// reads in message to start game
-		  	//clientMsg = in.readLine();
 
-		  	// do you even need the next two lines??
-		  	//System.out.println("Read the message: " + clientMsg);
-		  	//String[] parts = clientMsg.split(""); // splits message into length and letter
-				String[] parts;
+			//////////////////////////////////////////// SET UP FOR GAME ///////////////////////////////////////////////////////////// 
 
 
-		  	// set up for game
-		  	// picks random word, creates header
-		  	//if(parts[0].equals("0")) {
-
-				//send the word that the player will be guessing.
-				//System.out.println("Empty message sent, start game");
-
-				// select random word
-				int num = rand.nextInt(15);
-				//System.out.println("Random Number selected: " + num);
-				word = words[num];
-				System.out.println("Selected Word: " + word);
-
-				//length = word.length();
-				length = Integer.toString(word.length());
-				for(int i = 0; i < word.length(); i++) {
-				  wordInProgress += "_";
-				}
-
-				// packet formatted as msg flag = 0, length = word.length, incorrectguesses = 0, data = _____
-		        g1 = new Game(word, s);
-				data = "" + g1.getWordInProgress() + g1.getIncorrectGuesses();
-		        System.out.println(g1.getLength());
-		        System.out.println(g1.getNumIncorrect());
-		        String myStr = "0" + g1.getLength() + g1.getNumIncorrect() + data + "\n";
-		        System.out.println("--------" + g1.getWordInProgress());
-				out.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
-			//}
+			// select random word
+			int num = rand.nextInt(15);
+			word = words[num];
+			System.out.println("Selected Word: " + word);
 
 
+			// create word in progress
+			for(int i = 0; i < word.length(); i++) {
+			  wordInProgress += "_";
+			}
+
+
+			// packet formatted as msg flag = 0, length = word.length, incorrectguesses = 0, data = _____
+	        g1 = new Game(word, s);
+			data = "" + g1.getWordInProgress() + g1.getIncorrectGuesses();
+			out.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
+			System.out.println("Word in progress : " + g1.getWordInProgress());
+
+
+
+			//////////////////////////////////////////// GAME LOOP ///////////////////////////////////////////////////////////// 
+
+
+			// while player hasn't guessed word and doesn't have 6 incorrect guesses
 			while(g1.getGameOver() == false) {
+				
+
+				// get client message and guess
 				clientMsg = in.readLine();
 				parts = clientMsg.split("");
-				String guess = parts[1];
-				int count = 0; // number of hits with guess
+				guess = parts[1];
+				
+
+				// check if client guessed correctly and update word in progress
+				numHits = 0; // number of hits with guess
 				for (int i = 0; i < g1.getLength(); i++) {
 					if (g1.getWord().indexOf(guess, i) == i) {
-						count++;
+						numHits++;
 						g1.setWordInProgress(g1.getWordInProgress().substring(0, i) + guess + g1.getWordInProgress().substring(i + 1));
 					}
 				}
 
-				// if it was incorrect guess
-				if (count == 0) {
+				// if client guessed incorrectly, update number incorrect and incorrect guesses
+				if (numHits == 0) {
           			g1.setNumIncorrect(g1.getNumIncorrect() + 1);
           			g1.setIncorrectGuesses(g1.getIncorrectGuesses() + guess);
 				}
 
+
+				// send game packet to client with updated values
 				data = g1.getWordInProgress() + g1.getIncorrectGuesses();
-				System.out.println(data);
 				out.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
 
+
+				// if the client has guessed the word, send end game packets and ready for game over
 				if (!(g1.getWordInProgress().contains("_"))) {
 					g1.setGameOver(true);
-					out.writeBytes("8You Win!\n");
-					out.writeBytes("9GAME OVER\n");
+					out.writeBytes("You Win!\n");
+					out.writeBytes("Game Over!\n");
+
+				// if the client has guessed incorrectly 6 time, send end game messages and ready for game over
 				} else if (g1.getNumIncorrect() >= 6) {
 					g1.setGameOver(true);
-					out.writeBytes("9You Lose!\n");
-					out.writeBytes("9GAME OVER\n");
+					out.writeBytes("You Lose :(\n");
+					out.writeBytes("Game Over!\n");
 				}
 
 			}
@@ -299,8 +301,18 @@ class MultiClientHandler extends Thread {
 
 	@Override
 	public void run() {
-		String message;
-		String clientMsg;
+    	String message; // server's message
+		String clientMsg; // client's message
+		String[] parts; // will hold client's message
+		String guess; // will hold client's guess
+		String word = ""; // holder for assigned word
+		String data = ""; // word in progress and incorrect guesses
+		int numIncorrect = 0; // number of incorrect guesses
+		String wordInProgress = ""; // blanks with correct letters user has guessed
+		String incorrectGuesses = ""; // actual incorrect guesses
+    	Game g1 = null; // game object
+    	int numHits = 0; // number of hits with guess
+
 
 		String[] words = new String[15];
 		words[0] = "plan";
@@ -319,179 +331,184 @@ class MultiClientHandler extends Thread {
 		words[13] = "weight";
 		words[14] = "midnight";
 		Random rand = new Random();
-		String word = "";
-		String length = "";
-		String data = "";
-		int numIncorrect = 0;
-		String wordInProgress = ""; // blanks with correct letters user has guessed
-		String incorrectGuesses = "";
-    	ArrayList<Game> games = new ArrayList<>();
-    	Game g1 = null;
+		
 
 		try {
 
-		  	// reads in message to start game
-		  	//clientMsg = in.readLine();
-
-		  	// do you even need the next two lines??
-		  	//System.out.println("Read the message: " + clientMsg);
-		  	//String[] parts = clientMsg.split(""); // splits message into length and letter
-		  	String[] parts;
+		  
+			// send starting messages to both clients
+		  	out1.writeBytes("Game Starting!\n");
+		  	out2.writeBytes("Game Starting!\n");
 
 
-		  	// set up for game
-		  	// picks random word, creates header
-		  	//if(parts[0].equals("0")) {
 
-				//send the word that the player will be guessing.
-				//System.out.println("Empty message sent, start game");
+		  	//////////////////////////////////////////// SET UP FOR GAME /////////////////////////////////////////////////////////////
 
-		  	//game start
-		  	out1.writeBytes("14Game Starting!\n");
-		  	out1.writeBytes("10Your Turn!\n");
-		  	out2.writeBytes("14Game Starting!\n");
-				// select random word
-				int num = rand.nextInt(15);
-				//System.out.println("Random Number selected: " + num);
-				word = words[num];
-				System.out.println("Selected Word: " + word);
 
-				//length = word.length();
-				length = Integer.toString(word.length());
-				for(int i = 0; i < word.length(); i++) {
-				  wordInProgress += "_";
-				}
+			// select random word
+			int num = rand.nextInt(15);
+			word = words[num];
+			System.out.println("Selected Word: " + word);
 
-				// packet formatted as msg flag = 0, length = word.length, incorrectguesses = 0, data = _____
-		        g1 = new Game(word, s1);
-				data = "" + g1.getWordInProgress() + g1.getIncorrectGuesses();
-		        System.out.println(g1.getLength());
-		        System.out.println(g1.getNumIncorrect());
-		        String myStr = "0" + g1.getLength() + g1.getNumIncorrect() + data + "\n";
-		        System.out.println("--------" + g1.getWordInProgress());
-				out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
 
-				//send packet to p2 saying waiting for p1
-				out2.writeBytes("19Waiting on Player 1" + "\n");
-			//}
+			// create word in progress
+			for(int i = 0; i < word.length(); i++) {
+			  wordInProgress += "_";
+			}
+
+
+			// create new game
+	        g1 = new Game(word, s1);
+			System.out.println("Word in progress : " + g1.getWordInProgress());
+
+
+
+
+			//////////////////////////////////////////// GAME LOOP ///////////////////////////////////////////////////////////// 
 
 
 			while(g1.getGameOver() == false) {
 				
 
-////////////////////////////////////////////////////////// player 1's turn /////////////////////////////////////////////////
+				///////////////////////////////////////// player 1's turn /////////////////////////////////////////////////
 
+				//send message to Player 2
+				out2.writeBytes("Waiting on Player 1\n");
+
+
+				// send game packet to Player 1
+				out1.writeBytes("Your Turn!\n");
+				data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+				out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
+
+
+				// get P1 message and guess
 				clientMsg = in1.readLine();
 				parts = clientMsg.split("");
-				String guess = parts[1];
-				int count = 0; // number of hits with guess
-				boolean incorrect = false;
+				guess = parts[1];
+
+
+				// check if P1 guessed correctly and update word in progress
+				numHits = 0;
+				//boolean incorrect = false;
 				for (int i = 0; i < g1.getLength(); i++) {
 					if (g1.getWord().indexOf(guess, i) == i) {
-						count++;
+						numHits++;
 						g1.setWordInProgress(g1.getWordInProgress().substring(0, i) + guess + g1.getWordInProgress().substring(i + 1));
 					}
 				}
 
-				// if it was incorrect guess
-				if (count == 0) {
+
+				// if P1 guessed incorrectly, update number incorrect and incorrect guesses and send incorrect message to P1
+				// otherwise, send correct message to P1
+				if (numHits == 0) {
           			g1.setNumIncorrect(g1.getNumIncorrect() + 1);
           			g1.setIncorrectGuesses(g1.getIncorrectGuesses() + guess);
-          			incorrect = true;
-				}
-
-				if(incorrect == true) {
-					out1.writeBytes("9INCORRECT\n");
+          			out1.writeBytes("Incorrect!\n");
 				} else {
-					out1.writeBytes("7CORRECT\n");
+					out1.writeBytes("Correct!\n");
 				}
 
 
-
+				// if P1 has guessed the word, send end game messages and ready for game over
 				if (!(g1.getWordInProgress().contains("_"))) {
 					g1.setGameOver(true);
-					out1.writeBytes("8You Win!\n");
-					out1.writeBytes("9GAME OVER\n");
+					out1.writeBytes("You Win!\n");
+					out1.writeBytes("Game Over!\n");
 
-					// send game packet to player 2
+					// send last game packet to player 2
 					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
 					out2.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
 
-					out2.writeBytes("8You Win!\n");
-					out2.writeBytes("9GAME OVER\n");
+					out2.writeBytes("You Win!\n");
+					out2.writeBytes("Game Over!\n");
+
+
+				// if P1 has lost the game, send end game messages and ready for game over
 				} else if (g1.getNumIncorrect() >= 6) {
 					g1.setGameOver(true);
-					out1.writeBytes("9You Lose!\n");
-					out1.writeBytes("9GAME OVER\n");
+					out1.writeBytes("You Lose :(\n");
+					out1.writeBytes("Game Over!\n");
 
-					// send game packet to player 2
+					// send last game packet to player 2
 					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
-					System.out.println("number of incorrect guesses is: " + g1.getNumIncorrect());
 					out2.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
 
-					out2.writeBytes("9You Lose!\n");
-					out2.writeBytes("9GAME OVER\n");
+					out2.writeBytes("You Lose :(\n");
+					out2.writeBytes("Game Over!\n");
 				}
 
 
 
-/////////////////////////////////////////////////// player 2's turn /////////////////////////////////////////////////////////////////////////////
+
+				///////////////////////////////////////// player 2's turn /////////////////////////////////////////////////
 
 
-				out1.writeBytes("19Waiting on Player 2\n");
-				out2.writeBytes("10Your Turn!\n");
+
+				// send message to Player 1
+				out1.writeBytes("Waiting on Player 2\n");
+
+
+				// send game packet to P2
+				out2.writeBytes("Your Turn!\n");
 				data = g1.getWordInProgress() + g1.getIncorrectGuesses();
-				System.out.println(data);
 				out2.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
 
 
-
-				//Player 2 game play
+				// get P2 message and guess
 				clientMsg = in2.readLine();
 				parts = clientMsg.split("");
 				guess = parts[1];
-				count = 0; // number of hits with guess
-				incorrect = false;
+
+
+				// check if P2 guessed correctly and update word in progress
+				numHits = 0;
 				for (int i = 0; i < g1.getLength(); i++) {
 					if (g1.getWord().indexOf(guess, i) == i) {
-						count++;
+						numHits++;
 						g1.setWordInProgress(g1.getWordInProgress().substring(0, i) + guess + g1.getWordInProgress().substring(i + 1));
 					}
 				}
 
-				// if it was incorrect guess
-				if (count == 0) {
+
+				// if P2 guessed incorrectly, update number incorrect and incorrect guesses and send incorrect message to P2
+				// otherwise, send correct message to P2
+				if (numHits == 0) {
           			g1.setNumIncorrect(g1.getNumIncorrect() + 1);
           			g1.setIncorrectGuesses(g1.getIncorrectGuesses() + guess);
-          			incorrect = true;
-				}
-
-				if(incorrect == true) {
-					out2.writeBytes("9INCORRECT\n");
+          			out2.writeBytes("Incorrect!\n");
 				} else {
-					out2.writeBytes("7CORRECT\n");
+					out2.writeBytes("Correct!\n");
 				}
 
+
+				// if P2 has guessed the word, send end game messages and ready for gme over 
 				if (!(g1.getWordInProgress().contains("_"))) {
 					g1.setGameOver(true);
-					out1.writeBytes("8You Win!\n");
-					out1.writeBytes("9GAME OVER\n");
-					out2.writeBytes("8You Win!\n");
-					out2.writeBytes("9GAME OVER\n");
+					out1.writeBytes("You Win!\n");
+					out1.writeBytes("Game Over!\n");
+
+					// send last game packet to player 2
+					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+					out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
+
+					out2.writeBytes("You Win!\n");
+					out2.writeBytes("Game Over!\n");
+
+
+				// if P2 has lost the game, send end game messages and ready for game over
 				} else if (g1.getNumIncorrect() >= 6) {
 					g1.setGameOver(true);
-					out1.writeBytes("9You Lose!\n");
-					out1.writeBytes("9GAME OVER\n");
-					out2.writeBytes("9You Lose!\n");
-					out2.writeBytes("9GAME OVER\n");
+					out1.writeBytes("You Lose!\n");
+					out1.writeBytes("Game Over!\n");
+
+					// send last game packet to player 2
+					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+					out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
+
+					out2.writeBytes("You Lose!\n");
+					out2.writeBytes("Game Over!\n");
 				}
-
-				out2.writeBytes("19Waiting on Player 1\n");
-				out1.writeBytes("10Your Turn!\n");
-				data = g1.getWordInProgress() + g1.getIncorrectGuesses();
-				System.out.println(data);
-				out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
-
 			}
 		} catch (IOException e) {
 				e.printStackTrace();
