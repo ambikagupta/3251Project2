@@ -480,40 +480,41 @@ class MultiClientHandler extends Thread {
 
 				// if P1 has guessed the word, send end game messages and ready for game over
 				if (!(g1.getWordInProgress().contains("_"))) {
-					g1.setGameOver(true);
+					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+
+					out1.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
 					out1.writeBytes("" + getChar(8) + "You Win!");
 					out1.writeBytes("" + getChar(10) + "Game Over!");
 					//out1.writeBytes("You Win!\n");
 					//out1.writeBytes("Game Over!\n");
 
 					// send last game packet to player 2
-					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
 					out2.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
-					//out2.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
-
-					//out2.writeBytes("You Win!\n");
-					//out2.writeBytes("Game Over!\n");
 					out2.writeBytes("" + getChar(8) + "You Win!");
 					out2.writeBytes("" + getChar(10) + "Game Over!");
 
 
+					g1.setGameOver(true);
+
+
 				// if P1 has lost the game, send end game messages and ready for game over
 				} else if (g1.getNumIncorrect() >= 6) {
-					g1.setGameOver(true);
+					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+
 					//out1.writeBytes("You Lose :(\n");
 					//out1.writeBytes("Game Over!\n");
+					out1.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
 					out1.writeBytes("" + getChar(11) + "You Lose :(");
 					out1.writeBytes("" + getChar(10) + "Game Over!");
 
 					// send last game packet to player 2
-					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
 					//out2.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
 					out2.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
-
-					//out2.writeBytes("You Lose :(\n");
-					//out2.writeBytes("Game Over!\n");
 					out2.writeBytes("" + getChar(11) + "You Lose :(");
 					out2.writeBytes("" + getChar(10) + "Game Over!");
+
+
+					g1.setGameOver(true);
 				}
 
 
@@ -569,39 +570,46 @@ class MultiClientHandler extends Thread {
 
 				// if P2 has guessed the word, send end game messages and ready for gme over
 				if (!(g1.getWordInProgress().contains("_"))) {
-					g1.setGameOver(true);
+					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+
+					out2.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
+					out2.writeBytes("" + getChar(8) + "You Win!");
+					out2.writeBytes("" + getChar(10) + "Game Over!");
+
 					// out1.writeBytes("You Win!\n");
 					// out1.writeBytes("Game Over!\n");
+					out1.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
 					out1.writeBytes("" + getChar(8) + "You Win!");
 					out1.writeBytes("" + getChar(10) + "Game Over!");
 
 					// send last game packet to player 2
-					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
 					//out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
-					out1.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
 
 					// out2.writeBytes("You Win!\n");
 					// out2.writeBytes("Game Over!\n");
-					out2.writeBytes("" + getChar(8) + "You Win!");
-					out2.writeBytes("" + getChar(10) + "Game Over!");
+
+					g1.setGameOver(true);
 
 
 				// if P2 has lost the game, send end game messages and ready for game over
 				} else if (g1.getNumIncorrect() >= 6) {
-					g1.setGameOver(true);
+					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+
+					out2.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
+					out2.writeBytes("" + getChar(11) + "You Lose :(");
+					out2.writeBytes("" + getChar(10) + "Game Over!");
+
 					// out1.writeBytes("You Lose!\n");
 					// out1.writeBytes("Game Over!\n");
+					out1.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
 					out1.writeBytes("" + getChar(11) + "You Lose :(");
 					out1.writeBytes("" + getChar(10) + "Game Over!");
 
 					// send last game packet to player 2
-					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
-					out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
 
 					//out2.writeBytes("You Lose!\n");
 					//out2.writeBytes("Game Over!\n");
-					out2.writeBytes("" + getChar(11) + "You Lose :(");
-					out2.writeBytes("" + getChar(10) + "Game Over!");
+					g1.setGameOver(true);
 				}
 			}
 		} catch (IOException e) {
