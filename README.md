@@ -21,25 +21,25 @@ In order to complete this project, we divided the work as we progressed. We met 
         apt-get install default-jdk
         ```
 
-    * To compile
-      ```
-      make
-      ```
+* To compile
+  ```
+  make
+  ```
 
-    * To run
-      - Open two terminals
-        - The first terminal will be your Server terminal
-        - The second terminal will be your Client terminal
-      - In the Server terminal (MUST BE RUN FIRST)
-        ```
-        java Server [port number]
-        ```
-      - In the Client terminal
-        ```
-        java Client [IP address of Server] [port number]
-        ```
+* To run
+  - Open two terminals
+    - The first terminal will be your Server terminal
+    - The second terminal will be your Client terminal
+  - In the Server terminal (MUST BE RUN FIRST)
+    ```
+    java Server [port number]
+    ```
+  - In the Client terminal
+    ```
+    java Client [IP address of Server] [port number]
+    ```
 
-    * To clean
-      ```
-      make clean
-      ```
+* To clean
+  ```
+  make clean
+  ```
