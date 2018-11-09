@@ -17,7 +17,7 @@
 ## How to Run the Code & Install Dependent Packages
     * To install Java
       - Follow the code below or find more information [here] (https://thishosting.rocks/install-java-ubuntu/)
-        ``apt-get install default-jdk ```
+        ` apt-get install default-jdk `
 
     * To compile
       make
