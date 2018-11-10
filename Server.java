@@ -44,6 +44,7 @@ public class Server {
 							//dos.writeBytes("10server-overloaded" + "\n");
 							packet = message_to_bytes("server-overload");
 							dos.write(packet, 0, packet.length);
+							s.close();
 							//dos.writeBytes("" + getChar(15) + "server-overload");
 						} else {
 							MultiPlayerConn m = new MultiPlayerConn(s, dis, dos);
@@ -61,12 +62,14 @@ public class Server {
 							//m.out.writeBytes("10server-overloaded" + "\n");
 							packet = message_to_bytes("server-overload");
 							m.out.write(packet, 0, packet.length);
+							m.s.close();
 
 							//m.out.writeBytes("" + getChar(15) + "server-overload");
 							multi_conns_queue.remove(m);
 							// dos.writeBytes("10server-overloaded" + "\n");
 							packet = message_to_bytes("server-overload");
 							dos.write(packet, 0, packet.length);
+							s.close();
 							//dos.writeBytes("" + getChar(15) + "server-overload");
 						} else {
 							System.out.println("Assigning new multi thread for this client");
@@ -85,6 +88,7 @@ public class Server {
 						//dos.writeBytes("10server-overloaded" + "\n");
 						packet = message_to_bytes("server-overload");
 						dos.write(packet, 0, packet.length);
+						s.close();
 						//dos.writeBytes("" + getChar(15) + "server-overload");
 					} else {
 						System.out.println("Assigning new thread for this client");
