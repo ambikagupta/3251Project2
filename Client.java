@@ -188,7 +188,7 @@ class Client {
 				System.out.println(serverMsg);
 				if (serverMsg.contains("Game Over!") || serverMsg.contains("server-overload")) {
 					myBool = false;
-			  		s.close();
+			  		//s.close();
 				}
 			}
 	    }
