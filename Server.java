@@ -51,18 +51,14 @@ public class Server {
 						//check to see if three games or threads are running,
 						//if so send server overload message and close client socket.
 						if(conns.size() == 3) {
-							//dos.writeBytes("10server-overloaded" + "\n");
 							packet = message_to_bytes("server-overload");
 							dos.write(packet, 0, packet.length);
 							s.close();
-							//dos.writeBytes("" + getChar(15) + "server-overload");
 						} else {
 							//add multiplayer client to the queue
 							MultiPlayerConn m = new MultiPlayerConn(s, dis, dos);
 							multi_conns_queue.add(m);
 							System.out.println("Add multi client to queue");
-							//dos.writeBytes("25Waiting for other player!" + "\n");
-							//dos.writeBytes("" + getChar(25) + "Waiting for other player!");
 							packet = message_to_bytes("Waiting for other player!");
 							dos.write(packet, 0, packet.length);
 						}
@@ -73,21 +69,16 @@ public class Server {
 						//check if server-overload occurs, if so close client socket,
 						//and socket of player waiting in queue.
 						if(conns.size() == 3) {
-							//m.out.writeBytes("10server-overloaded" + "\n");
 							//send server overload message to client waiting in queue
 							//close socket
 							packet = message_to_bytes("server-overload");
 							m.out.write(packet, 0, packet.length);
 							m.s.close();
-
-							//m.out.writeBytes("" + getChar(15) + "server-overload");
 							multi_conns_queue.remove(m);
-							// dos.writeBytes("10server-overloaded" + "\n");
 							//send server overload message and close socket
 							packet = message_to_bytes("server-overload");
 							dos.write(packet, 0, packet.length);
 							s.close();
-							//dos.writeBytes("" + getChar(15) + "server-overload");
 						} else {
 							//create and start new thread for the multiplayer game
 							System.out.println("Assigning new multi thread for this client");
@@ -105,12 +96,10 @@ public class Server {
 					 //single player thread setup
 					 //check for server overload
 					if(conns.size() == 3) {
-						//dos.writeBytes("10server-overloaded" + "\n");
 						//close socket and send message
 						packet = message_to_bytes("server-overload");
 						dos.write(packet, 0, packet.length);
 						s.close();
-						//dos.writeBytes("" + getChar(15) + "server-overload");
 					} else {
 						//create and start new thread for the game
 						System.out.println("Assigning new thread for this client");
@@ -132,24 +121,6 @@ public class Server {
 			}
 		}
 	}
-	public static String getChar_message(String s) {
-		int length = s.length();
-		//char c = (char)(length + '0');
-		char c = (char)length;
-		String s_new = c + s;
-		return s_new;
-	}
-
-	public static char getChar(int i) {
-		//char c = (char)(i & 0xFF);
-		char c = (char)i;
-		return c;
-	}
-
-	public static int char_to_int(char c) {
-		int i = (int)c;
-		return i;
-	}
 
 	// convert message to bytes
 	public static byte[] message_to_bytes(String message) throws UnsupportedEncodingException {
@@ -164,7 +135,6 @@ public class Server {
 		packet[0] = msgFlag_to_bytes;
 		// copy all game packet bytes into byte array
 		System.arraycopy(message_to_bytes, 0 , packet, 1, message_to_bytes.length);
-		//System.arraycopy(message_to_bytes, 0, packet, msgFlag_to_bytes.length, message_to_bytes.length);
 
 		return packet;
 	}
@@ -196,7 +166,6 @@ class ClientHandler extends Thread {
 		this.s = s;
 		this.in = dis;
 		this.out = dos;
-		//this.in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 	}
 
 	@Override
@@ -256,13 +225,9 @@ class ClientHandler extends Thread {
 			// packet formatted as msg flag = 0, length = word.length, incorrectguesses = 0, data = _____
 			g1 = new Game(word, s);
 
-			// char flag = getChar(0);
-			// char incorrectGuess = getChar(g1.getNumIncorrect());
-			// char length = getChar(g1.getLength());
 			data = g1.getWordInProgress() + g1.getIncorrectGuesses();
 			packet = gamePacket_to_bytes(0, g1.getLength(), g1.getNumIncorrect(), data);
 			out.write(packet, 0, packet.length);
-			//out.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
 			System.out.println("Word in progress : " + g1.getWordInProgress());
 
 
@@ -270,51 +235,7 @@ class ClientHandler extends Thread {
 			//////////////////////////////////////////// GAME LOOP /////////////////////////////////////////////////////////////
 
 
-			// while player hasn't guessed word and doesn't have 6 incorrect guesses
-			// while(g1.getGameOver() == false) {
-			//
-			//
-			// 	// get client message and guess
-			// 	clientMsg = in.readLine();
-			// 	parts = clientMsg.split("");
-			// 	guess = parts[1];
-			//
-			//
-			// 	// check if client guessed correctly and update word in progress
-			// 	numHits = 0; // number of hits with guess
-			// 	for (int i = 0; i < g1.getLength(); i++) {
-			// 		if (g1.getWord().indexOf(guess, i) == i) {
-			// 			numHits++;
-			// 			g1.setWordInProgress(g1.getWordInProgress().substring(0, i) + guess + g1.getWordInProgress().substring(i + 1));
-			// 		}
-			// 	}
-			//
-			// 	// if client guessed incorrectly, update number incorrect and incorrect guesses
-			// 	if (numHits == 0) {
-      //     			g1.setNumIncorrect(g1.getNumIncorrect() + 1);
-      //     			g1.setIncorrectGuesses(g1.getIncorrectGuesses() + guess);
-			// 	}
-			//
-			//
-			// 	// send game packet to client with updated values
-			// 	data = g1.getWordInProgress() + g1.getIncorrectGuesses();
-			// 	out.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
-			//
-			//
-			// 	// if the client has guessed the word, send end game packets and ready for game over
-			// 	if (!(g1.getWordInProgress().contains("_"))) {
-			// 		g1.setGameOver(true);
-			// 		out.writeBytes("You Win!\n");
-			// 		out.writeBytes("Game Over!\n");
-			//
-			// 	// if the client has guessed incorrectly 6 time, send end game messages and ready for game over
-			// 	} else if (g1.getNumIncorrect() >= 6) {
-			// 		g1.setGameOver(true);
-			// 		out.writeBytes("You Lose :(\n");
-			// 		out.writeBytes("Game Over!\n");
-			// 	}
-			//
-			// }
+
 			while(g1.getGameOver() == false) {
 
 
@@ -359,8 +280,7 @@ class ClientHandler extends Thread {
 					out.write(packet, 0, packet.length);
 
 					s.close();
-					//out.writeBytes("" + getChar(8) + "You Win!");
-					//out.writeBytes("" + getChar(10) + "Game Over!");
+
 
 				// if the client has guessed incorrectly 6 time, send end game messages and ready for game over
 				} else if (g1.getNumIncorrect() >= 6) {
@@ -373,24 +293,20 @@ class ClientHandler extends Thread {
 					out.write(packet, 0, packet.length);
 
 					s.close();
-
-					//out.writeBytes("" + getChar(11) + "You Lose :(");
-					//out.writeBytes("" + getChar(10) + "Game Over!";
 				}
 
 
 			}
 		} catch (IOException e) {
 				e.printStackTrace();
-			}
+		}
 
-		try
-		{
+		try {
 			// closing resources
 			this.in.close();
 			this.out.close();
 
-		}catch(IOException e){
+		} catch(IOException e){
 			e.printStackTrace();
 		}
 	}
@@ -440,20 +356,15 @@ class MultiClientHandler extends Thread {
 	final Socket s2;
 	final DataInputStream in2;
 	final DataOutputStream out2;
-	//final BufferedReader in1;
-	//final BufferedReader in2;
-
 
 	// Constructor
 	public MultiClientHandler(Socket s1, DataInputStream dis1, DataOutputStream dos1, Socket s2, DataInputStream dis2, DataOutputStream dos2) throws IOException{
 		this.s1 = s1;
 		this.in1 = dis1;
 		this.out1 = dos1;
-		//this.in1 = new BufferedReader(new InputStreamReader(s1.getInputStream()));
 		this.s2 = s2;
 		this.in2 = dis2;
 		this.out2 = dos2;
-		//this.in2 = new BufferedReader(new InputStreamReader(s2.getInputStream()));
 	}
 
 	@Override
@@ -498,15 +409,10 @@ class MultiClientHandler extends Thread {
 
 
 			// send starting messages to both clients
-		  	//out1.writeBytes("Game Starting!\n");
-		  	//out2.writeBytes("Game Starting!\n");
 
 			packet = message_to_bytes("Game Starting!");
 			out1.write(packet, 0, packet.length);
 			out2.write(packet, 0, packet.length);
-				// out1.writeBytes("" + getChar(14) + "Game Starting!");
-				// out2.writeBytes("" + getChar(14) + "Game Starting!");
-
 
 
 		  	//////////////////////////////////////////// SET UP FOR GAME /////////////////////////////////////////////////////////////
@@ -536,141 +442,30 @@ class MultiClientHandler extends Thread {
 
 			while(g1.getGameOver() == false) {
 
+				//try {
+					///////////////////////////////////////// player 1's turn /////////////////////////////////////////////////
 
-				///////////////////////////////////////// player 1's turn /////////////////////////////////////////////////
-
-				//send message to Player 2
-				//out2.writeBytes("Waiting on Player 1\n");
-
-				packet = message_to_bytes("Waiting on Player 1");
-				out2.write(packet, 0, packet.length);
-				//out2.writeBytes("" + getChar(19) + "Waiting on Player 1");
-
-
-				// send game packet to Player 1
-				//out1.writeBytes("Your Turn!\n");
-				packet = message_to_bytes("Your Turn!");
-				out1.write(packet, 0, packet.length);
-				//out1.writeBytes("" + getChar(10) + "Your Turn!");
-				data = g1.getWordInProgress() + g1.getIncorrectGuesses();
-
-				packet = gamePacket_to_bytes(0, g1.getLength(), g1.getNumIncorrect(), data);
-				out1.write(packet, 0, packet.length);
-				//out1.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
-				//out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
-
-
-				// get P1 message and guess
-				// clientMsg = in1.readLine();
-				// parts = clientMsg.split("");
-				// guess = parts[1];
-
-				msgFlag = in1.readByte();
-
-				guessArray = new byte[1];
-				guessArray[0] = in1.readByte();
-				guess = new String(guessArray, "US-ASCII");
-
-
-				// msg = in1.read();
-				// guess = "" + getChar(in1.read());
-
-
-				// check if P1 guessed correctly and update word in progress
-				numHits = 0;
-				//boolean incorrect = false;
-				for (int i = 0; i < g1.getLength(); i++) {
-					if (g1.getWord().indexOf(guess, i) == i) {
-						numHits++;
-						g1.setWordInProgress(g1.getWordInProgress().substring(0, i) + guess + g1.getWordInProgress().substring(i + 1));
-					}
-				}
-
-
-				// if P1 guessed incorrectly, update number incorrect and incorrect guesses and send incorrect message to P1
-				// otherwise, send correct message to P1
-				if (numHits == 0) {
-          			g1.setNumIncorrect(g1.getNumIncorrect() + 1);
-          			g1.setIncorrectGuesses(g1.getIncorrectGuesses() + guess);
-					packet = message_to_bytes("Incorrect!");
-					//out2.write(packet, 0, packet.length);
-					//out1.writeBytes("" + getChar(10) + "Incorrect!");
-          			//out1.writeBytes("Incorrect!\n");
-				} else {
-					packet = message_to_bytes("Correct!");
-					//out2.write(packet, 0, packet.length);
-					//out1.writeBytes("" + getChar(8) + "Correct!");
-					//out1.writeBytes("Correct!\n");
-				}
-				out1.write(packet, 0, packet.length);
-
-
-				// if game over
-				if (!(g1.getWordInProgress().contains("_")) || g1.getNumIncorrect() >= 6) {
-					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
-
-					packet = gamePacket_to_bytes(0, g1.getLength(), g1.getNumIncorrect(), data);
-					out1.write(packet, 0, packet.length);
+					//send message to Player 2
+					packet = message_to_bytes("Waiting on Player 1");
 					out2.write(packet, 0, packet.length);
 
-					if (g1.getNumIncorrect() < 6) {
-						packet = message_to_bytes("You Win!");
-					} else {
-						packet = message_to_bytes("You Lose!");
-					}
-					out1.write(packet, 0, packet.length);
-					out2.write(packet, 0, packet.length);
-
-					packet = message_to_bytes("Game Over!");
-					out1.write(packet, 0, packet.length);
-					s1.close();
-					out2.write(packet, 0, packet.length);
-					s2.close();
-
-					g1.setGameOver(true);
-
-				}
-
-
-
-				///////////////////////////////////////// player 2's turn /////////////////////////////////////////////////
-
-				if(g1.getGameOver() == false) {
-					// send message to Player 1
-					//out1.writeBytes("Waiting on Player 2\n");
-					//out1.writeBytes("" + getChar(19) + "Waiting on Player 2");
-					packet = message_to_bytes("Waiting on Player 2");
-					out1.write(packet, 0, packet.length);
-
-
-					// send game packet to P2
-					//out2.writeBytes("Your Turn!\n");
-					//out2.writeBytes("" + getChar(10) + "Your Turn!");
+					// send game packet to Player 1
 					packet = message_to_bytes("Your Turn!");
-					out2.write(packet, 0, packet.length);
-
+					out1.write(packet, 0, packet.length);
 					data = g1.getWordInProgress() + g1.getIncorrectGuesses();
 
 					packet = gamePacket_to_bytes(0, g1.getLength(), g1.getNumIncorrect(), data);
-					out2.write(packet, 0, packet.length);
-					// //out2.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
-					// out2.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
+					out1.write(packet, 0, packet.length);
 
-
-					// get P2 message and guess
-					// clientMsg = in2.readLine();
-					// parts = clientMsg.split("");
-					// guess = parts[1];
-					// msg = in2.read();
-					// guess = "" + getChar(in2.read());
-
-					msgFlag = in2.readByte();
+					// get P1 message and guess
+					msgFlag = in1.readByte();
 
 					guessArray = new byte[1];
-					guessArray[0] = in2.readByte();
+					guessArray[0] = in1.readByte();
 					guess = new String(guessArray, "US-ASCII");
 
-					// check if P2 guessed correctly and update word in progress
+
+					// check if P1 guessed correctly and update word in progress
 					numHits = 0;
 					for (int i = 0; i < g1.getLength(); i++) {
 						if (g1.getWord().indexOf(guess, i) == i) {
@@ -680,18 +475,16 @@ class MultiClientHandler extends Thread {
 					}
 
 
-					// if P2 guessed incorrectly, update number incorrect and incorrect guesses and send incorrect message to P2
-					// otherwise, send correct message to P2
+					// if P1 guessed incorrectly, update number incorrect and incorrect guesses and send incorrect message to P1
+					// otherwise, send correct message to P1
 					if (numHits == 0) {
 	          			g1.setNumIncorrect(g1.getNumIncorrect() + 1);
 	          			g1.setIncorrectGuesses(g1.getIncorrectGuesses() + guess);
-	          			//out2.writeBytes("Incorrect!\n");
 						packet = message_to_bytes("Incorrect!");
 					} else {
-						//out2.writeBytes("Correct!\n");
 						packet = message_to_bytes("Correct!");
 					}
-					out2.write(packet, 0, packet.length);
+					out1.write(packet, 0, packet.length);
 
 
 					// if game over
@@ -719,88 +512,187 @@ class MultiClientHandler extends Thread {
 						g1.setGameOver(true);
 
 					}
-				}
 
 
 
-				// // if P2 has guessed the word, send end game messages and ready for gme over
-				// if (!(g1.getWordInProgress().contains("_"))) {
-				// 	data = g1.getWordInProgress() + g1.getIncorrectGuesses();
-				//
-				// 	out2.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
-				// 	out2.writeBytes("" + getChar(8) + "You Win!");
-				// 	out2.writeBytes("" + getChar(10) + "Game Over!");
-				//
-				// 	// out1.writeBytes("You Win!\n");
-				// 	// out1.writeBytes("Game Over!\n");
-				// 	out1.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
-				// 	out1.writeBytes("" + getChar(8) + "You Win!");
-				// 	out1.writeBytes("" + getChar(10) + "Game Over!");
-				//
-				// 	// send last game packet to player 2
-				// 	//out1.writeBytes("0" + g1.getLength() + g1.getNumIncorrect() + data + "\n");
-				//
-				// 	// out2.writeBytes("You Win!\n");
-				// 	// out2.writeBytes("Game Over!\n");
-				//
-				// 	g1.setGameOver(true);
-				//
-				//
-				// // if P2 has lost the game, send end game messages and ready for game over
-				// } else if (g1.getNumIncorrect() >= 6) {
-				// 	data = g1.getWordInProgress() + g1.getIncorrectGuesses();
-				//
-				// 	out2.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
-				// 	out2.writeBytes("" + getChar(11) + "You Lose :(");
-				// 	out2.writeBytes("" + getChar(10) + "Game Over!");
-				//
-				// 	// out1.writeBytes("You Lose!\n");
-				// 	// out1.writeBytes("Game Over!\n");
-				// 	out1.writeBytes("" + getChar(0) + getChar(g1.getLength()) + getChar(g1.getNumIncorrect()) + data);
-				// 	out1.writeBytes("" + getChar(11) + "You Lose :(");
-				// 	out1.writeBytes("" + getChar(10) + "Game Over!");
-				//
-				// 	// send last game packet to player 2
-				//
-				// 	//out2.writeBytes("You Lose!\n");
-				// 	//out2.writeBytes("Game Over!\n");
-				// 	g1.setGameOver(true);
+					///////////////////////////////////////// player 2's turn /////////////////////////////////////////////////
+
+					if(g1.getGameOver() == false) {
+						// send message to Player 1
+						packet = message_to_bytes("Waiting on Player 2");
+						out1.write(packet, 0, packet.length);
+
+
+						// send game packet to P2
+						packet = message_to_bytes("Your Turn!");
+						out2.write(packet, 0, packet.length);
+
+						data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+
+						packet = gamePacket_to_bytes(0, g1.getLength(), g1.getNumIncorrect(), data);
+						out2.write(packet, 0, packet.length);
+
+						// get P2 message and guess
+
+						msgFlag = in2.readByte();
+
+						guessArray = new byte[1];
+						guessArray[0] = in2.readByte();
+						guess = new String(guessArray, "US-ASCII");
+
+						// check if P2 guessed correctly and update word in progress
+						numHits = 0;
+						for (int i = 0; i < g1.getLength(); i++) {
+							if (g1.getWord().indexOf(guess, i) == i) {
+								numHits++;
+								g1.setWordInProgress(g1.getWordInProgress().substring(0, i) + guess + g1.getWordInProgress().substring(i + 1));
+							}
+						}
+
+
+						// if P2 guessed incorrectly, update number incorrect and incorrect guesses and send incorrect message to P2
+						// otherwise, send correct message to P2
+						if (numHits == 0) {
+		          			g1.setNumIncorrect(g1.getNumIncorrect() + 1);
+		          			g1.setIncorrectGuesses(g1.getIncorrectGuesses() + guess);
+							packet = message_to_bytes("Incorrect!");
+						} else {
+							packet = message_to_bytes("Correct!");
+						}
+						out2.write(packet, 0, packet.length);
+
+
+						// if game over
+						if (!(g1.getWordInProgress().contains("_")) || g1.getNumIncorrect() >= 6) {
+							data = g1.getWordInProgress() + g1.getIncorrectGuesses();
+
+							packet = gamePacket_to_bytes(0, g1.getLength(), g1.getNumIncorrect(), data);
+							out1.write(packet, 0, packet.length);
+							out2.write(packet, 0, packet.length);
+
+							if (g1.getNumIncorrect() < 6) {
+								packet = message_to_bytes("You Win!");
+							} else {
+								packet = message_to_bytes("You Lose!");
+							}
+							out1.write(packet, 0, packet.length);
+							out2.write(packet, 0, packet.length);
+
+							packet = message_to_bytes("Game Over!");
+							out1.write(packet, 0, packet.length);
+							s1.close();
+							out2.write(packet, 0, packet.length);
+							s2.close();
+
+							g1.setGameOver(true);
+
+						}
+					}
+				// } catch (SocketException e) {
+				// // 	if (s1.isConnected()) {
+				// // 		this.in2.close();
+				// // 		this.out2.close();
+				// // 	} else {
+				// // 		this.in1.close();
+				// // 		this.out2.close();
+				// // 	}
+				// 	e.printStackTrace();
+				// 	g1.setGameOver(false);
 				// }
+			}
+		} catch (SocketException e) {
+			e.printStackTrace();
+			System.out.println("caught socket excpetion");
+
+			// close s2 if s1 disconnected
+			try {
+				packet = message_to_bytes("Sorry, other player disconnected!");
+				out2.write(packet, 0, packet.length);
+				packet = message_to_bytes("Game Over!");
+				out2.write(packet, 0, packet.length);
+				s2.close();
+				System.out.println("S2 has been closed");
+			} catch (IOException i) {
+				// System.out.println("S2 disconnected fool! Look below!");
+				i.printStackTrace();
+				System.out.println("S2 was disconnected");
+			}
+			// close s1 somehow
+			try {
+				packet = message_to_bytes("Sorry, other player disconnected!");
+				out1.write(packet, 0, packet.length);
+				packet = message_to_bytes("Game Over!");
+				out1.write(packet, 0, packet.length);
+				s1.close();
+				System.out.println("S1 has been closed");
+			} catch (IOException j) {
+				// System.out.println("S1 disconnected fool! Look below!");
+				j.printStackTrace();
+				System.out.println("S1 was disconnected");
+			}
+			// e.printStackTrace();
+			// System.out.println("caught socket excpetion");
+			// try {
+			// 	packet = message_to_bytes("Game Over!");
+			// 	out1.write(packet, 0, packet.length);
+			// 	s1.close();
+			// 	s2.close();
+			// 	System.out.println("S2 disconnected, s1 closed");
+			// } catch (IOException i) {
+			// 	i.printStackTrace();
+			// }
+			// try {
+			// 	packet = message_to_bytes("Game Over!");
+			// 	out2.write(packet, 0, packet.length);
+			// 	s2.close();
+			// 	s1.close();
+			// 	System.out.println("s1 disconnected, s2 closed");
+			// } catch (IOException j) {
+			// 	j.printStackTrace();
+			// }
+		} catch (EOFException e) {
+			e.printStackTrace();
+			System.out.println("caught eof excpetion");
+
+			// close s2 if s1 disconnected
+			try {
+				packet = message_to_bytes("Sorry, other player disconnected!");
+				out2.write(packet, 0, packet.length);
+				packet = message_to_bytes("Game Over!");
+				out2.write(packet, 0, packet.length);
+				s2.close();
+				System.out.println("S2 has been closed");
+			} catch (IOException i) {
+				// System.out.println("S2 disconnected fool! Look below!");
+				i.printStackTrace();
+				System.out.println("S2 was disconnected");
+			}
+			// close s1 somehow
+			try {
+				packet = message_to_bytes("Sorry, other player disconnected!");
+				out1.write(packet, 0, packet.length);
+				packet = message_to_bytes("Game Over!");
+				out1.write(packet, 0, packet.length);
+				s1.close();
+				System.out.println("S1 has been closed");
+			} catch (IOException j) {
+				// System.out.println("S1 disconnected fool! Look below!");
+				j.printStackTrace();
+				System.out.println("S1 was disconnected");
 			}
 		} catch (IOException e) {
 				e.printStackTrace();
-			}
-
-		try
-		{
+		}
+		try {
 			// closing resources
 			this.in1.close();
 			this.out1.close();
 			this.in2.close();
 			this.out2.close();
 
-		}catch(IOException e){
+		} catch(IOException e){
 			e.printStackTrace();
 		}
-	}
-
-	public static String getChar_message(String s) {
-		int length = s.length();
-		//char c = (char)(length + '0');
-		char c = (char)length;
-		String s_new = c + s;
-		return s_new;
-	}
-
-	public static char getChar(int i) {
-		//char c = (char)(i & 0xFF);
-		char c = (char)i;
-		return c;
-	}
-
-	public static int char_to_int(char c) {
-		int i = (int)c;
-		return i;
 	}
 
 	public static byte[] gamePacket_to_bytes(int msgFlag, int wordLength, int numIncorrect, String data) throws UnsupportedEncodingException {
