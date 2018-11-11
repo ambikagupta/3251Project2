@@ -5,11 +5,11 @@ public class Game {
 
 	private String word;  // randomly selected word
 	private int length; // length of word
-  	private int numIncorrect;  //
-  	private String wordInProgress = "";
+  	private int numIncorrect;  // number of incorrect guesses
+  	private String wordInProgress = ""; // current word in progress
   	private String incorrectGuesses; // string of incorrect guesses in order
-  	private boolean gameOver;
-  	private Socket s;
+  	private boolean gameOver; // "true" when game is over for whatever reason
+  	private Socket s; // socket that game was created on
   	//private BufferedReader in; // messages coming in from client
 	//private	DataOutputStream out; // message outgoing to clien
 
