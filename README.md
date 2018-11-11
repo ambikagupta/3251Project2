@@ -2,7 +2,13 @@
 
 ## Description of Our Ideas
 
-In Server.java, we have a server that can handle multiple games and multiple users per game by creating a thread for each game. The server multithreads the game so that it can run multiple games at once with a max of three threads at a time. As each client connects to the server, it is asked if it would like to play with two players or as a single player. If the client requests a two player game, the server checks if there is another client waiting for a two player game. If so, it starts a multiplayer game with the two clients. If not, it stores the client while waiting for another client who would like to play a two player game
+In Server.java, we have a server that can handle multiple games and multiple users per game by creating a thread for each game. The server uses multithreading so that it can run multiple games at once with a max of three threads at a time. As each client connects to the server, it is asked if it would like to play with two players or as a single player. If the client requests a two player game, the server checks if there is another client waiting for a two player game. If so, it starts a multiplayer game with the two clients. If not, it stores the client while waiting for another client who would like to play a two player game. Once the multiplayer client has a partner or a single player arrives, the server assigns a thread to each game and calls the correct game handler. In the game handlers, game play and exit conditions are defined.
+
+In Client.java, we have the client code that handles reading input and writing output to a user and to the server. Once called, it asks the user for a single or multiplayer game, and communicates the answer to the server. It then handles game play by checking if the data coming from the server is a game packet or a message, and then follows the appropriate steps. It also checks if exit conditions are met to end the client gracefully.
+
+In Game.java, we have defined a Game object to make handling each game easier. It holds values for each game such as the word, incorrect guesses, word in progress, and a game over boolean.
+
+
 
 ## Contributors and Contributions
 **Ambika Gupta** and **Sahithi Puligundla**
