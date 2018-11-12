@@ -1,0 +1,388 @@
+SAMPLE OUTPUT
+
+--------------------------------------------------------------------------------
+--------------------------------SINGLE PLAYER-----------------------------------
+--------------------------------------------------------------------------------
+
+
+--------------------------------WINNING GAME------------------------------------
+
+-bash-4.1$ java Client 130.207.114.26 5008
+Two Player? (y/n)
+n
+_ _ _ _ _ _
+
+Incorrect Guesses:
+
+Letter to Guess: a
+_ _ _ _ _ _
+
+Incorrect Guesses: a
+
+Letter to Guess: v
+v _ _ _ _ _
+
+Incorrect Guesses: a
+
+Letter to Guess: o
+v o _ _ _ _
+
+Incorrect Guesses: a
+
+Letter to Guess: a
+Error! Letter "a" has been guessed before, please guess another letter.
+Letter to Guess: v
+Error! Letter "v" has been guessed before, please guess another letter.
+Letter to Guess: l
+v o l _ _ _
+
+Incorrect Guesses: a
+
+Letter to Guess: u
+v o l u _ _
+
+Incorrect Guesses: a
+
+Letter to Guess: 3
+Error! Please guess one letter.
+Letter to Guess: ff
+Error! Please guess one letter.
+Letter to Guess: 6r
+Error! Please guess one letter.
+Letter to Guess: m
+v o l u m _
+
+Incorrect Guesses: a
+
+Letter to Guess: e
+v o l u m e
+
+Incorrect Guesses: a
+
+You Win!
+Game Over!
+-bash-4.1$
+
+
+
+---------------------------------LOSING GAME------------------------------------
+
+
+-bash-4.1$ java Client 130.207.114.26 5008
+Two Player? (y/n)
+N
+_ _ _ _ _ _ _ _
+
+Incorrect Guesses:
+
+Letter to Guess: A
+_ _ _ _ _ _ _ _
+
+Incorrect Guesses: a
+
+Letter to Guess: v
+_ _ _ _ v _ _ _
+
+Incorrect Guesses: a
+
+Letter to Guess: V
+Error! Letter "v" has been guessed before, please guess another letter.
+Letter to Guess: E
+_ e _ _ v e _ _
+
+Incorrect Guesses: a
+
+Letter to Guess: d
+d e _ _ v e _ _
+
+Incorrect Guesses: a
+
+Letter to Guess: D
+Error! Letter "d" has been guessed before, please guess another letter.
+Letter to Guess: A
+Error! Letter "a" has been guessed before, please guess another letter.
+Letter to Guess: E3
+Error! Please guess one letter.
+Letter to Guess: b
+d e _ _ v e _ _
+
+Incorrect Guesses: a b
+
+Letter to Guess: c
+d e _ _ v e _ _
+
+Incorrect Guesses: a b c
+
+Letter to Guess: f
+d e _ _ v e _ _
+
+Incorrect Guesses: a b c f
+
+Letter to Guess: G
+d e _ _ v e _ _
+
+Incorrect Guesses: a b c f g
+
+Letter to Guess: h
+d e _ _ v e _ _
+
+Incorrect Guesses: a b c f g h
+
+You Lose :(
+Game Over!
+-bash-4.1$
+
+
+
+--------------------------------------------------------------------------------
+-----------------------------MULTIPLAYER PLAYER---------------------------------
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------WINNING GAME------------------------------------
+
+
+----------------------------------PLAYER 1--------------------------------------
+
+-bash-4.1$ java Client 130.207.114.26 5008
+Two Player? (y/n)
+y
+Waiting for other player!
+Game Starting!
+Your Turn!
+_ _ _ _ _ _
+
+Incorrect Guesses:
+
+Letter to Guess: v
+Correct!
+Waiting on Player 2
+Your Turn!
+v o _ _ _ _
+
+Incorrect Guesses:
+
+Letter to Guess: l
+Correct!
+Waiting on Player 2
+Your Turn!
+v o l _ _ _
+
+Incorrect Guesses: i
+
+Letter to Guess: J
+Incorrect!
+Waiting on Player 2
+Your Turn!
+v o l u _ _
+
+Incorrect Guesses: i j
+
+Letter to Guess: 3
+Error! Please guess one letter.
+Letter to Guess: rr
+Error! Please guess one letter.
+Letter to Guess: I
+Error! Letter "i" has been guessed before, please guess another letter.
+Letter to Guess: m
+Correct!
+Waiting on Player 2
+v o l u m e
+
+Incorrect Guesses: i j
+
+You Win!
+Game Over!
+-bash-4.1$
+
+
+
+----------------------------------PLAYER 2--------------------------------------
+
+-bash-4.1$ java Client 130.207.114.26 5008
+Two Player? (y/n)
+y
+Game Starting!
+Waiting on Player 1
+Your Turn!
+v _ _ _ _ _
+
+Incorrect Guesses:
+
+Letter to Guess: o
+Correct!
+Waiting on Player 1
+Your Turn!
+v o l _ _ _
+
+Incorrect Guesses:
+
+Letter to Guess: i
+Incorrect!
+Waiting on Player 1
+Your Turn!
+v o l _ _ _
+
+Incorrect Guesses: i j
+
+Letter to Guess: J
+Error! Letter "j" has been guessed before, please guess another letter.
+Letter to Guess: u
+Correct!
+Waiting on Player 1
+Your Turn!
+v o l u m _
+
+Incorrect Guesses: i j
+
+Letter to Guess: e
+Correct!
+v o l u m e
+
+Incorrect Guesses: i j
+
+You Win!
+Game Over!
+-bash-4.1$
+
+
+
+
+
+
+-----------------------------PLAYER DISCONNECTS---------------------------------
+
+
+
+----------------------------------PLAYER 1--------------------------------------
+
+-bash-4.1$ java Client 130.207.114.26 5008
+Two Player? (y/n)
+y
+Waiting for other player!
+Game Starting!
+Your Turn!
+_ _ _ _ _ _ _ _
+
+Incorrect Guesses:
+
+Letter to Guess: ^C-bash-4.1$
+
+
+
+----------------------------------PLAYER 2--------------------------------------
+
+-bash-4.1$ java Client 130.207.114.26 5008
+Two Player? (y/n)
+y
+Game Starting!
+Waiting on Player 1
+Sorry, other player disconnected!
+Game Over!
+-bash-4.1$
+
+
+
+
+
+
+---------------------------------LOSING GAME------------------------------------
+
+
+----------------------------------PLAYER 1--------------------------------------
+
+-bash-4.1$ java Client 130.207.114.26 5008
+Two Player? (y/n)
+Y
+Waiting for other player!
+Game Starting!
+Your Turn!
+_ _ _ _
+
+Incorrect Guesses:
+
+Letter to Guess: T
+Correct!
+Waiting on Player 2
+Your Turn!
+t _ _ _
+
+Incorrect Guesses: u
+
+Letter to Guess: V
+Incorrect!
+Waiting on Player 2
+Your Turn!
+t _ _ _
+
+Incorrect Guesses: u v x
+
+Letter to Guess: I
+Correct!
+Waiting on Player 2
+Your Turn!
+t i _ _
+
+Incorrect Guesses: u v x p
+
+Letter to Guess: Z
+Incorrect!
+Waiting on Player 2
+t i _ _
+
+Incorrect Guesses: u v x p z y
+
+You Lose!
+Game Over!
+-bash-4.1$
+
+
+
+----------------------------------PLAYER 2--------------------------------------
+
+-bash-4.1$ java Client 130.207.114.26 5008
+Two Player? (y/n)
+Y
+Game Starting!
+Waiting on Player 1
+Your Turn!
+t _ _ _
+
+Incorrect Guesses:
+
+Letter to Guess: U
+Incorrect!
+Waiting on Player 1
+Your Turn!
+t _ _ _
+
+Incorrect Guesses: u v
+
+Letter to Guess: X
+Incorrect!
+Waiting on Player 1
+Your Turn!
+t i _ _
+
+Incorrect Guesses: u v x
+
+Letter to Guess: U
+Error! Letter "u" has been guessed before, please guess another letter.
+Letter to Guess: P
+Incorrect!
+Waiting on Player 1
+Your Turn!
+t i _ _
+
+Incorrect Guesses: u v x p z
+
+Letter to Guess: Y
+Incorrect!
+t i _ _
+
+Incorrect Guesses: u v x p z y
+
+You Lose!
+Game Over!
+-bash-4.1$

@@ -1,46 +1,44 @@
 import java.net.*;
 import java.io.*;
 
-//This was Client2
 
 class Client {
 
 	public static void main(String args[]) throws Exception {
-		String userGuess;
-		String serverMsg = "";
+		String userGuess; // user's guess for current turn
+		String serverMsg = ""; // server message formatted for printing
 
 		String serverIP = args[0];
 		int serverPort = Integer.parseInt(args[1]);
 
 		InetAddress addr = InetAddress.getByName(serverIP);
 
-		int numIncorrect;
-		String incorrectGuesses;
-	    int wordLength;
-	    int numBlanks;
-	    boolean myBool = true;
-	    String[] parts;
-		byte[] wordPacket;
-		byte[] guessPacket;
-		byte[] packet;
-		int msgFlag;
-		String wordInProgress;
-		String WIP_spaces;
-		String IG_spaces;
-		byte[] in_msg_Packet;
+		int numIncorrect; // number of incorrectGuesses
+		String incorrectGuesses; // incorrect guesses
+	    int wordLength; // length of word
+	    int numBlanks; // number of dashes in word
+	    boolean myBool = true; // true while game is still running
+		byte[] wordPacket; // byte array of word in progress
+		byte[] guessPacket; // byte array of incorrect guesses
+		byte[] packet; // byte array of guess to send to server
+		int msgFlag; // message flag of server's message
+		String wordInProgress; // word in progress
+		String WIP_spaces; // word in progress wformatted for printing
+		String IG_spaces; // incorrect guesses formatted for printing
+		byte[] in_msg_Packet; // byte array of message from server
 
 
 
     	// socket creation
 		Socket s = new Socket(addr, serverPort);
-		DataInputStream in = new DataInputStream(s.getInputStream()); //in from server
-	    DataOutputStream out = new DataOutputStream(s.getOutputStream()); // message to send to server
-	    BufferedReader inUser = new BufferedReader(new InputStreamReader(System.in)); //user InputStreamReader
+		DataInputStream in = new DataInputStream(s.getInputStream()); // input from server
+	    DataOutputStream out = new DataOutputStream(s.getOutputStream()); // output to server
+	    BufferedReader inUser = new BufferedReader(new InputStreamReader(System.in)); // input from user
 
     	System.out.println("Two Player? (y/n)");
     	String yn = inUser.readLine();    // Answer to Two Player question.
 
-    	boolean checkYN = true;
+    	boolean checkYN = true; // user input validatioin
 
     	// validating user input from Two Player question (y or n)
 	    while (checkYN) {
@@ -58,6 +56,9 @@ class Client {
 	    } else {
 			out.writeByte(0);
 	    }
+
+
+		/////////////////////////////////////////////////////////////// GAME LOOP /////////////////////////////////////////////////////////////////////////////////////////////
 
 
 		while(myBool) {
@@ -192,6 +193,7 @@ class Client {
 	  }
 
 
+// convert message to byte array
 	public static byte[] message_to_bytes(String message) throws UnsupportedEncodingException {
 		// convert everything to bytes
 		int msgFlag = message.length();

@@ -25,7 +25,7 @@ In order to complete this project, we divided the work as we progressed. We met 
 
 
 ## How to Run the Code & Install Dependent Packages
-* To install Java locally on Linux
+* To install Java on Linux
   - Follow the code below or find more information [here](https://thishosting.rocks/install-java-ubuntu/)
     ```
     apt-get install default-jdk
@@ -62,15 +62,15 @@ In order to complete this project, we divided the work as we progressed. We met 
   - Push files to shuttle server
     - Replace [agupta437] with your GT username
     - Replace [cc-shuttle1] with another shuttle server name if desired
-      ```
-      scp * agupta437@cc-shuttle1.cc.gatech.edu:/nethome/agupta437
-      ```
+    ```
+    scp * agupta437@cc-shuttle1.cc.gatech.edu:/nethome/agupta437
+    ```
   - Navigate into the shuttle servers
     - Replace [agupta437] with your GT username
     - Replace [cc-shuttle1] with whichever shuttle server you used for the previous step
-      ```
-      ssh agupta437@cc-shuttle1.cc.gatech.edu
-      ```
+    ```
+    ssh agupta437@cc-shuttle1.cc.gatech.edu
+    ```
   - Open another terminal and repeat the previous step
   - Run Server in the first terminal [MUST BE RUN FIRST]
     - java Server [port number]
@@ -84,3 +84,11 @@ In order to complete this project, we divided the work as we progressed. We met 
   ```
   make clean
   ```
+
+
+Tips:
+  - To find your IP address
+    ```
+    ifconfig
+    ```
+  - Make sure to use IPv4
